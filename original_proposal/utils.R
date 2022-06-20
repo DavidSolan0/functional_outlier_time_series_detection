@@ -32,3 +32,24 @@ B <- function(i,n,l){
   vector[cam] <- n
   vector
 }
+
+#* cleaning 
+
+multistep1 <- function(x,depths){
+  
+  procesos <- x  
+  dim <- length(procesos)
+  
+  o = NULL
+  for(i in 1:dim){
+    o0 <- fda::fbplot(t(procesos[[i]]),plot=FALSE,depth = depths)$outpoint
+    o <- unique(c(o0,o))
+  }
+  
+  o <- unique(o)
+  
+  if(length(o)!=0){
+    for(i in 1:dim) procesos[[i]] <- procesos[[i]][-o,]
+  }
+  return(procesos)
+}

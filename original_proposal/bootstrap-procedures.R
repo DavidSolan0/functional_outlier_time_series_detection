@@ -42,12 +42,12 @@ SmBoD <- function (x, dfunc = MBD, nb = 200, smo = 0.05, ns = 0.01)
 MBBo <- function(x,l=4,nb=200,dfunc=MBD,ns=0.01,smo=0){
   
   # params:
-  # x: functional data
-  # l: block size 
-  # dfunc: depth function
-  # nb: number of bootstrap samples
-  # smo: smoothness parameter
-  # ns: quantile for cutoff estimation
+   # x: functional data
+   # l: block size 
+   # dfunc: depth function
+   # nb: number of bootstrap samples
+   # smo: smoothness parameter
+   # ns: quantile for cutoff estimation
   
   
   n <- nrow.fdata(x)
@@ -84,12 +84,12 @@ MBBo <- function(x,l=4,nb=200,dfunc=MBD,ns=0.01,smo=0){
 StBo <- function(x,p=0.1,nb=200,dfunc=MBD,ns=0.01,smo=0){
   
   # params:
-  # p: success probability for geometric distribution
-  # x: functional data
-  # dfunc: depth function
-  # nb: number of bootstrap samples
-  # smo: smoothness parameter
-  # ns: quantile for cutoff estimation
+   # p: success probability for geometric distribution
+   # x: functional data
+   # dfunc: depth function
+   # nb: number of bootstrap samples
+   # smo: smoothness parameter
+   # ns: quantile for cutoff estimation
   
   n  <- nrow.fdata(x)
   depths <- dfunc(x[["data"]])
