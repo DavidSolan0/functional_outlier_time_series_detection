@@ -1,0 +1,1 @@
+This function follows the same logic as their analogous' in the [original_process](https://github.com/DavidSolan0/functional_outlier_time_series_detection/tree/main/original_proposal) folder. To run these functions, you must have run the original_process **simulated-models** and **utils**
