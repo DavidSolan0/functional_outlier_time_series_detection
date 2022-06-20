@@ -1,5 +1,14 @@
 
-tasas.nc <- function(rho,method=Outlier.boot,m.boot=SmBoD,M=100,dfunc=MBD,ns=0.01){
+tasas.nc <- function(rho,method=Outlier.boot,boot=SmBoD,M=100,dfunc=MBD,ns=0.01){
+  
+  # this function calculates the error ratios for the uncontaminated model 
+  # params:
+   # rho: correlation parameter. 
+   # method: outlier detection procedure. 
+   # m.boot: bootstrap procedure to estimate the cutoff
+   # M: number of simulations 
+   # dfunc: functional depth to use
+   # ns: quantile to use in each bootstrap iteration to estimate the cutoff
   
   pf = NULL
   for(l in 1:M){
@@ -9,7 +18,7 @@ tasas.nc <- function(rho,method=Outlier.boot,m.boot=SmBoD,M=100,dfunc=MBD,ns=0.0
     depths <- dfunc(x[["data"]])
     fdataobj <- step1(x,depths)
     
-    d <- method(fdataobj,dfunc = dfunc,boot=m.boot)$outliers
+    d <- method(fdataobj,dfunc = dfunc,boot=boot)$outliers
     
     pf[l] <- ifelse(length(d)!=0, length(d)/200, 0)
     
@@ -20,6 +29,16 @@ tasas.nc <- function(rho,method=Outlier.boot,m.boot=SmBoD,M=100,dfunc=MBD,ns=0.0
 
 tasas <- function(rho,k=10,model=magnitude,method=Outlier.boot,M=100,dfunc=MBD
                   ,boot=SmBoD){
+  
+  # this function calculates the error ratios for the contaminated models 
+  # params:
+   # rho: correlation parameter. 
+   # method: outlier detection procedure. 
+   # boot: bootstrap procedure to estimate the cutoff
+   # M: number of simulations 
+   # dfunc: functional depth to use
+   # ns: quantile to use in each bootstrap iteration to estimate the cutoff
+  
   
   pf = NULL;pc=NULL;cut = NULL
   for(l in 1:M){
@@ -75,6 +94,15 @@ tasas <- function(rho,k=10,model=magnitude,method=Outlier.boot,M=100,dfunc=MBD
 
 rates <- function(rho,k1=10,k2=4,k3=10,method=Outlier.boot,M=100,dfunc=MBD
                   ,boot=MBBo){
+  
+  # this function calculates the error ratios for the contaminated model with all types of contamination
+  # params:
+   # rho: correlation parameter. 
+   # method: outlier detection procedure. 
+   # boot: bootstrap procedure to estimate the cutoff
+   # M: number of simulations 
+   # dfunc: functional depth to use
+   # ns: quantile to use in each bootstrap iteration to estimate the cutoff
   
   pf = NULL;pc=NULL;cut = NULL
   for(l in 1:M){
