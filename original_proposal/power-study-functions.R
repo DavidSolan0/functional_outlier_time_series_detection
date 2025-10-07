@@ -11,7 +11,8 @@ uncontaminated_rates <- function(
   # returns:
   #   list containing:
   #     false_positive_rate: Mean false positive rate
-  #     false_positive_vector: Vector of false positive rates for each simulation
+  #     false_positive_vector: Vector of false positive rates for 
+  #       each simulation
 
   # Initialize positive false rate vector
   false_positive_vector <- NULL
@@ -57,7 +58,8 @@ calculate_rates <- function(
   #     false_positive_rate: Mean false positive rate
   #     true_positive_rate: Mean true positive rate
   #     sd_true_positive_rate: Standard deviation of true positive rate
-  #     true_positive_rate_zero_clean: Mean true positive rate when data not cleaned
+  #     true_positive_rate_zero_clean: Mean true positive rate when data 
+  #       not cleaned
   #     cut_off: Mean estimated cutoff value
 
   # Initialize variables
@@ -137,7 +139,8 @@ calculate_rates <- function(
 calculate_rates_full_contamination <- function(
     rho, k1 = 10, k2 = 4, k3 = 10, method = outlier_bootstrap, M = 100, dfunc = MBD,
     boot = MBBo) {
-  # This function calculates the error ratios for the contaminated model with all types of contamination
+  # This function calculates the error ratios for the contaminated model with 
+  # all types of contamination
   # params:
   #   rho: Correlation parameter
   #   k1: First contamination level
@@ -152,7 +155,8 @@ calculate_rates_full_contamination <- function(
   #     false_positive_rate: Mean false positive rate
   #     true_positive_rate: Mean true positive rate
   #     sd_true_positive_rate: Standard deviation of true positive rate
-  #     true_positive_rate_zero_clean: Mean true positive rate when data not cleaned
+  #     true_positive_rate_zero_clean: Mean true positive rate when data 
+  #       not cleaned
   #     cut_off: Mean estimated cutoff value
 
   # Initialize variables

@@ -14,7 +14,7 @@ source("original_proposal/simulated-models.R")
 source("original_proposal/depths.R")
 source("original_proposal/bootstrap-procedures.R")
 source("original_proposal/outlier-detection-procedures.R")
-source("original_proposal/power-study.R")
+source("original_proposal/power-study-functions.R")
 source("original_proposal/calculate_rates_results.R")
 
 #* Parameters
