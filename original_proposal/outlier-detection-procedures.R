@@ -1,87 +1,146 @@
-
-outlier_bootstrap <- function(fdataobj, nb = 200, smo = 0.05, quan=0.5,
-                         dfunc = MBD, l=4, p=0.1, ns=0.01, boot=SmBoD) 
-{
-  
+#* Outlier Bootstrap
+outlier_bootstrap <- function(fdataobj, nb = 200, smo = 0.05, quan = 0.5,
+                              dfunc = MBD, l = 4, p = 0.1, ns = 0.01, boot = SmBoD) {
+  # This function implements outlier detection using bootstrap procedures
   # params:
-   # fdataobj = a functional data object usually obtained from fda 
-   # nb = bootstrap sample
-   # smo = smoothness parameter 
-   # quan = quantile to obtain cutoff estimation from the bootstrap procedure
-   # dfunc = depht to use
-   # l = Block size (MBBo)
-   # p = success probability for geometric ditribution (StBo)
-   # ns = quantile to calculate in each bootstrap iteration to cutoff estimation
-   # boot = bootstrap type. SmBoD to Standar. MBBo to moving block. StBo to Standard smoothed bootstrap on residuals
+  #   fdataobj: Functional data object to analyze
+  #   nb: Number of bootstrap samples to generate
+  #   smo: Smoothness parameter for adding noise
+  #   quan: Quantile used for cutoff estimation from bootstrap
+  #   dfunc: Depth function to use for outlier detection
+  #   l: Block size (only used for MBBo bootstrap)
+  #   p: Success probability for geometric distribution (only used for StBo)
+  #   ns: Quantile to calculate in each bootstrap iteration
+  #   boot: Bootstrap procedure to use (SmBoD, MBBo, or StBo)
+  # returns:
+  #   list containing:
+  #     outliers: Vector of detected outlier indices
+  #     dep.out: Vector of depth values for outliers
+  #     iteration: Vector indicating iteration when each outlier was found
+  #     quantile: Estimated cutoff value
+  #     Dep: Vector of depth values for all curves
 
-    
-  if (!is.fdata(fdataobj)) 
+  # Check if fdataobj is a functional data object
+  if (!is.fdata(fdataobj)) {
     fdataobj <- fdata(fdataobj)
+  }
+
+  # Check if fdataobj contains any NA values
   nas1 <- is.na(fdataobj)
-  if (any(nas1)) 
+  if (any(nas1)) {
     stop("fdataobj contain ", sum(nas1), " curves with some NA value \n")
+  }
+
+  # Extract data, arguments, and range values
   x <- fdataobj[["data"]]
   tt <- fdataobj[["argvals"]]
   rtt <- fdataobj[["rangeval"]]
   n <- nrow(fdataobj)
   m <- ncol(fdataobj)
-  if (is.null(n) && is.null(m)) 
+  if (is.null(n) && is.null(m)) {
     stop("ERROR IN THE DATA DIMENSIONS")
-  if (is.null(row.names(fdataobj[["data"]]))) 
-    row.names(fdataobj[["data"]]) = 1:n
-  
-  cutoff <- quantile(boot(fdataobj, dfunc = dfunc, nb = nb, smo = smo, ns=ns),
-                     probs = quan)
-  
+  }
+  if (is.null(row.names(fdataobj[["data"]]))) {
+    row.names(fdataobj[["data"]]) <- 1:n
+  }
+
+  # Calculate cutoff using the bootstrap procedure
+  cutoff <- quantile(boot(fdataobj, dfunc = dfunc, nb = nb, smo = smo, ns = ns),
+    probs = quan
+  )
+
+  # Initialize variables
   hay <- 1
   outliers <- dep.out <- ite <- c()
   ii <- 1
   curvasgood <- fdataobj
-  
+
+  # Calculate depths
   d <- dfunc(curvasgood[["data"]])
-  
-  rwn = names(d) = rownames(curvasgood[["data"]]) = 1:n
+
+  # Loop through the data
   while (hay == 1) {
     if (is.null(outliers)) {
       dtotal <- d
     }
+    # Check if the depth is less than the cutoff
     cutt <- d < cutoff
+
+    # Get the indices of the outliers
     fecha <- as.numeric(rownames(curvasgood[["data"]])[cutt])
     elim <- which(cutt)
+
+    # Check if there are any outliers
     if (length(elim) > 0) {
+      # Add the depths of the outliers
       dep.out <- c(dep.out, d[elim])
+
+      # Remove the outliers from the data
       curvasgood <- curvasgood[-elim, ]
+
+      # Add the indices of the outliers
       outliers <- c(outliers, fecha)
     }
-    if (length(elim) == 0 || length(outliers) > n/5) {
+
+    # Check if there are no outliers or if there are more than 20% of the data
+    if (length(elim) == 0 || length(outliers) > n / 5) {
       hay <- 0
-    }
-    else {
+    } else {
       d <- dfunc(curvasgood[["data"]])
     }
+
+    # Add the indices of the iterations
     ite <- c(ite, rep(ii, length(elim)))
     ii <- ii + 1
   }
+
+  # Get the names of the outliers
   outliers <- rownames(fdataobj[["data"]])[outliers]
   names(dep.out) <- NULL
-  return(list(outliers = as.numeric(outliers),dep.out=dep.out ,iteration = ite, 
-              quantile = cutoff, Dep = dtotal))
+
+  # Return the outliers, the depths of the outliers,
+  # the indices of the iterations, the cutoff, and the depths
+  return(list(
+    outliers = as.numeric(outliers), dep.out = dep.out, iteration = ite,
+    quantile = cutoff, Dep = dtotal
+  ))
 }
 
-FBox <- function(fdataobj,dfunc=MBD,boot=boot){
-  curvasgood  <- fdataobj 
-  depths <- dfunc(curvasgood[["data"]])
-  o <- outpoint <- fda::fbplot(t(curvasgood[["data"]]),plot=FALSE,depth = depths)$outpoint
-  
-  if(length(outpoint)!=0){
-    curvasgood <- curvasgood[-outpoint]
-    
-    while(length(o)!=0){
-      depths <- dfunc(curvasgood[["data"]])
-      o <- fda::fbplot(t(curvasgood[["data"]]),plot=FALSE, depth = depths)$outpoint
-      curvasgood <- curvasgood[-o]
-      outpoint = c(outpoint,o)
+#* FBox
+FBox <- function(fdataobj, dfunc = MBD, boot = boot) {
+  # This function implements outlier detection using functional boxplots
+  # params:
+  #   fdataobj: Functional data object to analyze
+  #   dfunc: Depth function to use for outlier detection
+  #   boot: Bootstrap procedure to estimate cutoff
+  # returns:
+  #   list containing:
+  #     outliers: Vector of detected outlier indices
+
+  # Ensure input is functional data object
+  if (!is.fdata(fdataobj)) {
+    fdataobj <- fdata(fdataobj)
+  }
+
+  # Initialize variables
+  data <- fdataobj[["data"]]
+  all_outliers <- c()
+  has_outliers <- TRUE
+
+  while (has_outliers && nrow(data) > 0) {
+    # Calculate depths and find outliers
+    depths <- dfunc(data)
+    fbplot_result <- fda::fbplot(t(data), plot = FALSE, depth = depths)
+    current_outliers <- fbplot_result$outpoint
+
+    if (length(current_outliers) == 0) {
+      has_outliers <- FALSE
+    } else {
+      # Update outliers list and remove from data
+      all_outliers <- c(all_outliers, current_outliers)
+      data <- data[-current_outliers,]
     }
   }
-  return(list(outliers=outpoint))
+
+  return(list(outliers = all_outliers))
 }

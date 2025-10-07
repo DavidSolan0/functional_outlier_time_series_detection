@@ -5,51 +5,83 @@ library(mrfDepth)
 
 #* uniform Discrete
 
-runifdisc<-function(n, min=0, max=1) sample(min:max, n, replace=TRUE)
+runifdisc <- function(n, min = 0, max = 1) sample(min:max, n, replace = TRUE)
 
 #* first step of the cut off estimation algorithm
 
-step1 <- function(fdataobj,depths)
-{
-  o <- fda::fbplot(t(fdataobj$data),plot=FALSE,depth = depths)$outpoint
-  
-  if(length(o)!=0)
-    fdataobj[["data"]] <- fdataobj[["data"]][-o,]
-  
+clean_outliers <- function(fdataobj, depths) {
+  # params:
+  # fdataobj: functional data object
+  # depths: depths of the functional data object
+
+  # Check if fdataobj is a functional data object
+  if (!is.fdata(fdataobj)) {
+    fdataobj <- fdata(fdataobj)
+  }
+
+  # Extract data
+  dat <- fdataobj[["data"]]
+
+  # Calculate outliers
+  o <- fda::fbplot(t(dat), plot = FALSE, depth = depths)$outpoint
+
+  # Clean outliers
+  if (length(o) != 0) {
+    fdataobj[["data"]] <- fdataobj[["data"]][-o, ]
+  }
+
   return(fdataobj)
 }
 
-#* clock's i curves 
+#* clock's i curves
 
-Bi <- function(i,l) i:(i+l-1)
+block_i_generator <- function(i, l) i:(i + l - 1)
 
 #* module
 
-B <- function(i,n,l){
-  vector <-  i:(i+l-1)%%n
-  mod <- vector%%n
-  cam <- mod==0
+block_StBo_generator <- function(i, n, l) {
+  vector <- i:(i + l - 1) %% n
+  mod <- vector %% n
+  cam <- mod == 0
   vector[cam] <- n
   vector
 }
 
-#* cleaning 
+#* cleaning
 
-multistep1 <- function(x,depths){
-  
-  procesos <- x  
-  dim <- length(procesos)
-  
-  o = NULL
-  for(i in 1:dim){
-    o0 <- fda::fbplot(t(procesos[[i]]),plot=FALSE,depth = depths)$outpoint
-    o <- unique(c(o0,o))
+clean_outliers_multivariate <- function(fdata, depths) {
+  # params:
+  # fdata: multivariate functional data object
+  # depths: depths of the multivariate functional data object
+
+  # Check if fdata is a multivariate functional data object
+  if (!is.list(fdata)) {
+    fdata <- list(fdata)
   }
-  
+
+  # Extract data
+  multivariate_fdata <- fdata
+  dim <- length(multivariate_fdata)
+
+  # Initialize vector for outliers
+  o <- NULL
+  for (i in 1:dim) {
+    # Calculate outliers
+    o0 <- fda::fbplot(t(multivariate_fdata[[i]]), plot = FALSE, depth = depths)
+    o0 <- o0$outpoint
+
+    # Update vector for outliers
+    o <- unique(c(o0, o))
+  }
+
+  # Get unique outliers
   o <- unique(o)
-  
-  if(length(o)!=0){
-    for(i in 1:dim) procesos[[i]] <- procesos[[i]][-o,]
+
+  # Clean outliers
+  if (length(o) != 0) {
+    for (i in 1:dim) multivariate_fdata[[i]] <- multivariate_fdata[[i]][-o, ]
   }
-  return(procesos)
+
+  # Return multivariate functional data object
+  return(multivariate_fdata)
 }

@@ -1,12 +1,25 @@
-MD <- function (fdataobj, fdataori = fdataobj, trim = 0, metric = metric.lp, 
-                h = NULL, scale = FALSE, draw = FALSE) 
-{
-  if (!is.fdata(fdataobj)) 
+MD <- function(fdataobj, fdataori = fdataobj, trim = 0, metric = metric.lp,
+               h = NULL, scale = FALSE, draw = FALSE) {
+  # This function calculates the Modified Band Depth for functional data
+  # params:
+  #   fdataobj: Functional data object to calculate depths for
+  #   fdataori: Reference functional data object (defaults to fdataobj)
+  #   trim: Trimming parameter between 0 and 1
+  #   metric: Distance metric to use
+  #   h: Bandwidth parameter for kernel
+  #   scale: Whether to scale depths to [0,1] range
+  #   draw: Whether to draw plot of depths
+  # returns:
+  #   dep: Vector of depth values for each curve
+
+  if (!is.fdata(fdataobj)) {
     fdataobj <- fdata(fdataobj)
+  }
   if (is.fdata(fdataobj)) {
     fdat <- TRUE
-    if (is.null(rownames(fdataobj$data))) 
+    if (is.null(rownames(fdataobj$data))) {
       rownames(fdataobj$data) <- 1:nrow(fdataobj$data)
+    }
     nms <- rownames(fdataobj$data)
     m0 <- nrow(fdataobj)
     fdataobj <- na.omit(fdataobj)
@@ -17,12 +30,13 @@ MD <- function (fdataobj, fdataori = fdataobj, trim = 0, metric = metric.lp,
     data2 <- fdataori[["data"]]
     names1 <- names2 <- names <- fdataobj[["names"]]
     names1$main <- "depth.mode median"
-    names2$main <- paste("depth.mode trim ", trim * 100, 
-                         "%", sep = "")
-    tt = fdataobj[["argvals"]]
+    names2$main <- paste("depth.mode trim ", trim * 100,
+      "%",
+      sep = ""
+    )
+    tt <- fdataobj[["argvals"]]
     rtt <- fdataobj[["rangeval"]]
-  }
-  else {
+  } else {
     stop("no fdata class object")
     data <- fdataobj
     data2 <- fdataori
@@ -32,42 +46,51 @@ MD <- function (fdataobj, fdataori = fdataobj, trim = 0, metric = metric.lp,
   m <- ncol(data)
   m2 <- ncol(data2)
   n2 <- nrow(data2)
-  if (is.null(n) && is.null(m)) 
+  if (is.null(n) && is.null(m)) {
     stop("ERROR IN THE DATA DIMENSIONS")
-  if (is.null(m) && is.null(m2)) 
+  }
+  if (is.null(m) && is.null(m2)) {
     stop("ERROR IN THE DATA DIMENSIONS")
-  if (is.matrix(metric)) 
-    mdist = metric
-  else mdist = metric(fdataori, fdataori)
+  }
+  if (is.matrix(metric)) {
+    mdist <- metric
+  } else {
+    mdist <- metric(fdataori, fdataori)
+  }
   class(mdist) <- "matrix"
   if (n == n2 & m == m2) {
     equal <- all(fdataobj$data == fdataori$data)
-    if (equal) 
+    if (equal) {
       mdist2 <- mdist
-    else mdist2 <- metric(fdataobj, fdataori)
+    } else {
+      mdist2 <- metric(fdataobj, fdataori)
+    }
+  } else {
+    mdist2 <- metric(fdataobj, fdataori)
   }
-  else mdist2 <- metric(fdataobj, fdataori)
   if (is.null(h)) {
     h <- 0.15
-    hq2 = quantile(mdist, probs = h, na.rm = TRUE)
-  }
-  else {
-    if (is.numeric(h)) 
+    hq2 <- quantile(mdist, probs = h, na.rm = TRUE)
+  } else {
+    if (is.numeric(h)) {
       hq2 <- h
-    else hq2 = quantile(mdist, probs = as.numeric(substring(h, 
-                                                            first = 3)), na.rm = TRUE)
+    } else {
+      hq2 <- quantile(mdist, probs = as.numeric(substring(h,
+        first = 3
+      )), na.rm = TRUE)
+    }
   }
   class(mdist) <- class(mdist2) <- c("matrix", "fdist")
-  ans <- Ker.norm(mdist2/hq2)
+  ans <- Ker.norm(mdist2 / hq2)
   ans <- apply(ans, 1, sum, na.rm = TRUE)
   if (scale) {
     mn <- min(ans, na.rm = TRUE)
     mx <- max(ans, na.rm = TRUE)
-    ans = as.vector(ans/mx)
+    ans <- as.vector(ans / mx)
   }
-  k = which.max(ans)
-  med = data[k, ]
-  lista = which(ans >= quantile(ans, probs = trim, na.rm = T))
+  k <- which.max(ans)
+  med <- data[k, ]
+  lista <- which(ans >= quantile(ans, probs = trim, na.rm = T))
   if (nullans) {
     ans1 <- rep(NA, len = m0)
     ans1[-nas] <- ans
@@ -77,11 +100,12 @@ MD <- function (fdataobj, fdataori = fdataobj, trim = 0, metric = metric.lp,
   if (length(lista) == 1) {
     mtrim <- data[lista, ]
     if (draw) {
-      draw = FALSE
+      draw <- FALSE
       warning("The plot is not shown")
     }
+  } else {
+    mtrim <- apply(fdataobj[lista]$data, 2, mean, na.rm = TRUE)
   }
-  else mtrim = apply(fdataobj[lista]$data, 2, mean, na.rm = TRUE)
   tr <- paste("mode.tr", trim * 100, "%", sep = "")
   if (fdat) {
     med <- fdata(med, tt, rtt, names1)
@@ -95,42 +119,59 @@ MD <- function (fdataobj, fdataori = fdataobj, trim = 0, metric = metric.lp,
         scl <- mx - mn
       }
       ind1 <- !is.nan(ans)
-      ans[is.nan(ans)] = NA
-      cgray = 1 - (ans - mn)/(scl)
+      ans[is.nan(ans)] <- NA
+      cgray <- 1 - (ans - mn) / (scl)
       plot(fdataori, col = gray(0.9), lty = 1, main = "mode Depth")
       lines(fdataobj[ind1, ], col = gray(cgray[ind1]))
       lines(mtrim, lwd = 2, col = "yellow")
       lines(med, col = "red", lwd = 2)
-      legend("topleft", legend = c(tr, "Median"), lwd = 2, 
-             col = c("yellow", "red"), box.col = 0)
+      legend("topleft",
+        legend = c(tr, "Median"), lwd = 2,
+        col = c("yellow", "red"), box.col = 0
+      )
     }
   }
-  out <- list(median = med, lmed = k, mtrim = mtrim, ltrim = lista, 
-              dep = ans, hq = hq2)
-  if (scale) 
-    out$dscale = mx
-  return(dep=ans)
+  out <- list(
+    median = med, lmed = k, mtrim = mtrim, ltrim = lista,
+    dep = ans, hq = hq2
+  )
+  if (scale) {
+    out$dscale <- mx
+  }
+  return(dep = ans)
 }
 
-MFD<- function (mfdataobj, z = NULL, type = "hdepth", alpha = 0, time = NULL, 
-                diagnostic = FALSE, depthOptions = NULL,weights) 
-{
-  if(is.matrix(mfdataobj)){
+MFD <- function(mfdataobj, z = NULL, type = "hdepth", alpha = 0, time = NULL,
+                diagnostic = FALSE, depthOptions = NULL, weights) {
+  # This function calculates the Multivariate Functional Depth for functional data
+  # params:
+  #   mfdataobj: Multivariate functional data object to calculate depths for
+  #   z: Reference functional data object (optional)
+  #   type: Type of depth to use ("hdepth", "projdepth", "sprojdepth", "dprojdepth", "sdepth")
+  #   alpha: Trimming parameter between 0 and 1
+  #   time: Time points for evaluation
+  #   diagnostic: Whether to return diagnostic information
+  #   depthOptions: Additional options for depth calculation
+  #   weights: Optional weights for time points
+  # returns:
+  #   Vector of depth values for each curve
+
+  if (is.matrix(mfdataobj)) {
     n <- nrow(mfdataobj)
     m <- ncol(mfdataobj)
-    x <- array(dim= c(m,n,1))
-    x[,,1] <- t(mfdataobj)
+    x <- array(dim = c(m, n, 1))
+    x[, , 1] <- t(mfdataobj)
   }
-  
-  if(is.list(mfdataobj)){
+
+  if (is.list(mfdataobj)) {
     dim <- length(mfdataobj)
     n <- nrow(mfdataobj[[1]])
     m <- ncol(mfdataobj[[1]])
-    x <- array(dim= c(m,n,dim))
-    for(i in 1:dim) x[,,i] <- t(mfdataobj[[i]])
+    x <- array(dim = c(m, n, dim))
+    for (i in 1:dim) x[, , i] <- t(mfdataobj[[i]])
   }
-  
-  
+
+
   if (missing(x)) {
     stop("Input argument x is required.")
   }
@@ -167,8 +208,10 @@ MFD<- function (mfdataobj, z = NULL, type = "hdepth", alpha = 0, time = NULL,
   if (t1 != t2) {
     stop("The t dimension of x and z must match.")
   }
-  Indtype <- match(type, c("hdepth", "projdepth", "sprojdepth", 
-                           "dprojdepth", "sdepth"))[1]
+  Indtype <- match(type, c(
+    "hdepth", "projdepth", "sprojdepth",
+    "dprojdepth", "sdepth"
+  ))[1]
   if (is.na(Indtype)) {
     stop("type should be one of hdepth, projdepth , sprojdepth, dprojdepth or sdepth.")
   }
@@ -185,15 +228,13 @@ MFD<- function (mfdataobj, z = NULL, type = "hdepth", alpha = 0, time = NULL,
     if (alpha > 1) {
       stop("alpha should be part of [0,1]")
     }
-  }
-  else if (is.matrix(alpha)) {
+  } else if (is.matrix(alpha)) {
     NRowAlpha <- dim(alpha)[1]
     NColAlpha <- dim(alpha)[2]
     if (NRowAlpha != 1 || NColAlpha != t1) {
       stop("alpha must be a (1xt)-row matrix.")
     }
-  }
-  else {
+  } else {
     stop("alpha must be either a number or a (1xt)-row matrix.")
   }
   if (is.null(time)) {
@@ -210,8 +251,7 @@ MFD<- function (mfdataobj, z = NULL, type = "hdepth", alpha = 0, time = NULL,
     if (min(dTime) <= 0) {
       stop("time should be strictly increasing.")
     }
-  }
-  else {
+  } else {
     dTime <- 1
   }
   if (!is.logical(diagnostic)) {
@@ -239,8 +279,7 @@ MFD<- function (mfdataobj, z = NULL, type = "hdepth", alpha = 0, time = NULL,
     if (p1 == 1) {
       xTimePoint <- matrix(x[j, , 1])
       zTimePoint <- matrix(z[j, , 1])
-    }
-    else {
+    } else {
       xTimePoint <- x[j, , , drop = TRUE]
       zTimePoint <- z[j, , , drop = TRUE]
     }
@@ -252,66 +291,62 @@ MFD<- function (mfdataobj, z = NULL, type = "hdepth", alpha = 0, time = NULL,
       if (!is.null(temp$depthZ)) {
         depthsTimeX[, j] <- temp$depthZ
         depthsTimeZ[, j] <- temp$depthZ
-      }
-      else {
+      } else {
         exactfit <- 1
       }
       if (diagnostic & p1 == 2 & exactfit == FALSE) {
         temp <- compBagplot(x = xTimePoint, type = type)
         if (sum(is.nan(temp$flag)) == 0) {
           locOutlX[, j] <- temp$flag
-        }
-        else {
+        } else {
           warningFlagBag <- 1
           warningIndBag <- c(warningIndBag, j)
         }
       }
-    }
-    else if (type == "projdepth") {
-      temp <- projdepth(x = xTimePoint, z = zTimePoint, 
-                        options = depthOptions)
+    } else if (type == "projdepth") {
+      temp <- projdepth(
+        x = xTimePoint, z = zTimePoint,
+        options = depthOptions
+      )
       if (!is.null(temp$depthZ)) {
         depthsTimeX[, j] <- temp$depthX
         depthsTimeZ[, j] <- temp$depthZ
         locOutlX[, j] <- as.numeric(!temp$flagX)
         locOutlZ[, j] <- as.numeric(!temp$flagZ)
-      }
-      else {
+      } else {
         exactfit <- 1
       }
-    }
-    else if (type == "sprojdepth") {
-      temp <- sprojdepth(x = xTimePoint, z = zTimePoint, 
-                         options = depthOptions)
+    } else if (type == "sprojdepth") {
+      temp <- sprojdepth(
+        x = xTimePoint, z = zTimePoint,
+        options = depthOptions
+      )
       if (!is.null(temp$depthZ)) {
         depthsTimeX[, j] <- temp$depthX
         depthsTimeZ[, j] <- temp$depthZ
         locOutlX[, j] <- as.numeric(!temp$flagX)
         locOutlZ[, j] <- as.numeric(!temp$flagZ)
-      }
-      else {
+      } else {
         exactfit <- 1
       }
-    }
-    else if (type == "dprojdepth") {
-      temp <- dprojdepth(x = xTimePoint, z = zTimePoint, 
-                         options = depthOptions)
+    } else if (type == "dprojdepth") {
+      temp <- dprojdepth(
+        x = xTimePoint, z = zTimePoint,
+        options = depthOptions
+      )
       if (!is.null(temp$depthZ)) {
         depthsTimeX[, j] <- temp$depthX
         depthsTimeZ[, j] <- temp$depthZ
         locOutlX[, j] <- as.numeric(!temp$flagX)
         locOutlZ[, j] <- as.numeric(!temp$flagZ)
-      }
-      else {
+      } else {
         exactfit <- 1
       }
-    }
-    else {
+    } else {
       temp <- sdepth(x = xTimePoint, z = zTimePoint)
       if (!is.null(temp$depth)) {
         depthsTimeZ[, j] <- temp$depth
-      }
-      else {
+      } else {
         exactfit <- 1
       }
     }
@@ -328,25 +363,23 @@ MFD<- function (mfdataobj, z = NULL, type = "hdepth", alpha = 0, time = NULL,
           if (nrow(Vert) != nrow(unique(Vert))) {
             warningFlagIso <- 1
             warningIndIso <- c(warningIndIso, j)
-          }
-          else {
+          } else {
             if (p1 == 1) {
               temp <- max(Vert) - min(Vert)
-            }
-            else {
-              temp <- try(convhulln(matrix(Vert, ncol = p1), 
-                                    "FA")$vol, silent = TRUE)
+            } else {
+              temp <- try(convhulln(
+                matrix(Vert, ncol = p1),
+                "FA"
+              )$vol, silent = TRUE)
             }
             if (!is.numeric(temp)) {
               warningFlagAlpha <- 1
               warningIndAlpha <- c(warningIndAlpha, j)
-            }
-            else {
+            } else {
               weights[j] <- temp
             }
           }
-        }
-        else {
+        } else {
           weights[j] <- 0
           warningFlagIso <- 1
           warningIndIso <- c(warningIndIso, j)
@@ -356,11 +389,13 @@ MFD<- function (mfdataobj, z = NULL, type = "hdepth", alpha = 0, time = NULL,
   }
   options(warn = Original$warn)
   weights <- weights * dTime
-  weights <- weights/sum(weights)
+  weights <- weights / sum(weights)
   depthsX <- depthsTimeX %*% weights
   depthsZ <- depthsTimeZ %*% weights
-  Result <- list(MFDdepthX = depthsX, MFDdepthZ = depthsZ, 
-                 weights = weights)
+  Result <- list(
+    MFDdepthX = depthsX, MFDdepthZ = depthsZ,
+    weights = weights
+  )
   if (diagnostic) {
     Result$crossdepthX <- depthsTimeX
     Result$crossdepthZ <- depthsTimeZ
@@ -370,27 +405,41 @@ MFD<- function (mfdataobj, z = NULL, type = "hdepth", alpha = 0, time = NULL,
   Result$depthType <- type
   class(Result) <- c("mrfDepth", "mfd")
   if (warningFlagFit == 1) {
-    warning(paste("Exact fits were detected for certain time points.", 
-                  "Their weights will be set to zero.", "Check the returned results"), 
-            call. = FALSE)
+    warning(
+      paste(
+        "Exact fits were detected for certain time points.",
+        "Their weights will be set to zero.", "Check the returned results"
+      ),
+      call. = FALSE
+    )
     Result$IndFlagExactFit <- warningIndFit
   }
   if (warningFlagBag == 1) {
-    warning(paste("The bagplot could not be computed at all time points.", 
-                  "Their weights will be set to zero.", "Check the returned results"), 
-            call. = FALSE)
+    warning(
+      paste(
+        "The bagplot could not be computed at all time points.",
+        "Their weights will be set to zero.", "Check the returned results"
+      ),
+      call. = FALSE
+    )
     Result$IndFlagBag <- warningIndBag
   }
   if (warningFlagIso == 1) {
-    warning(paste("The isohdepth contours could not be computed at all", 
-                  "time points. Their weights will be set to zero.", 
-                  "Check the returned results"), call. = FALSE)
+    warning(paste(
+      "The isohdepth contours could not be computed at all",
+      "time points. Their weights will be set to zero.",
+      "Check the returned results"
+    ), call. = FALSE)
     Result$IndFlagIso <- warningIndIso
   }
   if (warningFlagAlpha == 1) {
-    warning(paste("The specified alpha is too large at all time points.", 
-                  "Their weights will be set to zero.", "Check the returned results"), 
-            call. = FALSE)
+    warning(
+      paste(
+        "The specified alpha is too large at all time points.",
+        "Their weights will be set to zero.", "Check the returned results"
+      ),
+      call. = FALSE
+    )
     Result$IndFlagAlpha <- warningIndAlpha
   }
   return(as.vector(depthsX))
