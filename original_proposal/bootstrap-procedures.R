@@ -29,8 +29,8 @@ SmBoD <- function(x, dfunc = MBD, nb = 200, smo = 0.05, ns = 0.01) {
   # Calculate depths and trim the sample by removing outliers
   # using naive approach (fbplot)
   depths <- dfunc(x[["data"]])
-  muestra.trim <- clean_outliers(x, depths)
-  nn <- nrow(muestra.trim)
+  trimmed_sample <- clean_outliers(x, depths)
+  nn <- nrow(trimmed_sample)
 
   # Initialize vector for quantiles
   cuantiles <- numeric(nb)
@@ -42,14 +42,14 @@ SmBoD <- function(x, dfunc = MBD, nb = 200, smo = 0.05, ns = 0.01) {
   for (i in 1:nb) {
     # Sample indices with replacement
     sample_index <- sample(1:nn, size = n, replace = TRUE)
-    bmuestra <- muestra.trim[sample_index, ]
+    sample_b <- trimmed_sample[sample_index, ]
 
     # Add noise to the sample
     mvnorm_noise <- mvrnorm(n = n, rep(0, m), vv * smo)
-    bmuestra[["data"]] <- bmuestra[["data"]] + mvnorm_noise
+    sample_b[["data"]] <- sample_b[["data"]] + mvnorm_noise
 
     # Calculate depths
-    d <- dfunc(bmuestra[["data"]])
+    d <- dfunc(sample_b[["data"]])
 
     # Calculate quantile
     cuantiles[i] <- quantile(d, probs = ns, type = 8)
@@ -71,14 +71,14 @@ MBBo <- function(x, l = 4, nb = 200, dfunc = MBD, ns = 0.01, smo = 0) {
 
   # Get number of functional data objects
   # and block size
-  n <- nrow.fdata(x)
+  n <- nrow._data(x)
   k <- ceiling(n / l)
 
   # Calculate depths and trim the sample by removing outliers
   # using naive approach (fbplot)
   depths <- dfunc(x[["data"]])
-  muestra.trim <- clean_outliers(x, depths)
-  nn <- nrow.fdata(muestra.trim)
+  trimmed_sample <- clean_outliers(x, depths)
+  nn <- nrow_fdata(trimmed_sample)
 
   # Initialize vector for quantiles
   i <- 1:(nn - l + 1)
@@ -88,24 +88,24 @@ MBBo <- function(x, l = 4, nb = 200, dfunc = MBD, ns = 0.01, smo = 0) {
   for (j in 1:nb) {
     # Sample indices with replacement with a
     # discrete uniform distribution
-    I <- runifdisc(k, min = min(i), max = max(i))
+    idx_sample <- runifdisc(k, min = min(i), max = max(i))
 
     # Initialize vector for indices
-    bmuestra.ind <- c()
+    sample_b_idx <- c()
 
     # Loop through block size
     for (m in 1:k) {
-      bmuestra.ind <- c(bmuestra.ind, block_i_generator(I[m], l = l))
+      sample_b_idx <- c(sample_b_idx, block_i_generator(idx_sample[m], l = l))
     }
 
     # Keep only the first n indices
-    bmuestra.ind <- bmuestra.ind[1:n]
+    sample_b_idx <- sample_b_idx[1:n]
 
     # Extract the bootstrap sample
-    bmuestra <- muestra.trim[bmuestra.ind, ]
+    sample_b <- trimmed_sample[sample_b_idx, ]
 
     # Calculate depths
-    d <- dfunc(bmuestra[["data"]])
+    d <- dfunc(sample_b[["data"]])
 
     # Calculate quantile
     cuantiles[j] <- quantile(d, probs = ns, type = 8)
@@ -127,14 +127,14 @@ StBo <- function(x, p = 0.1, nb = 200, dfunc = MBD, ns = 0.01, smo = 0) {
 
   # Get number of functional data objects
   # and block size
-  n <- nrow.fdata(x)
+  n <- nrow._data(x)
   k <- ceiling(n / l)
 
   # Calculate depths and trim the sample by removing outliers
   # using naive approach (fbplot)
   depths <- dfunc(x[["data"]])
-  muestra.trim <- clean_outliers(x, depths)
-  nn <- nrow.fdata(muestra.trim)
+  trimmed_sample <- clean_outliers(x, depths)
+  nn <- nrow_fdata(trimmed_sample)
 
   # Initialize vector for indices
   i <- 1:nn
@@ -159,20 +159,20 @@ StBo <- function(x, p = 0.1, nb = 200, dfunc = MBD, ns = 0.01, smo = 0) {
 
     # Sample indices with replacement with a
     # discrete uniform distribution
-    I <- runifdisc(l.ls, min = min, max = max)
+    idx_sample <- runifdisc(l.ls, min = min, max = max)
 
     # Initialize vector for indices
     block_i <- c()
     for (m in 1:l.ls)
     {
-      block_i <- c(block_i, block_StBo_generator(I[m], nn, lengths[m]))
+      block_i <- c(block_i, block_StBo_generator(idx_sample[m], nn, lengths[m]))
     }
 
     # Extract the bootstrap sample
-    bmuestra <- muestra.trim[block_i, ]
+    sample_b <- trimmed_sample[block_i, ]
 
     # Calculate depths
-    d <- dfunc(bmuestra[["data"]])
+    d <- dfunc(sample_b[["data"]])
 
     # Calculate quantile
     cuantiles[j] <- quantile(d, probs = ns, type = 8)
