@@ -8,7 +8,7 @@ run_simulation <- function(
     seed = NULL,
     model = magnitude,
     model_name = "",
-    outlier_detection_method = Outlier.boot,
+    outlier_detection_method = outlier_bootstrap,
     bootstrap_estimation_method = SmBoD) {
   # This function runs a simulation study for outlier detection with
   # different depth functions

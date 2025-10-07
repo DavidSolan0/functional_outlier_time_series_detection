@@ -1,5 +1,5 @@
 uncontaminated_rates <- function(
-    rho, method = Outlier.boot, boot = SmBoD, M = 100, dfunc = MBD, ns = 0.01) {
+    rho, method = outlier_bootstrap, boot = SmBoD, M = 100, dfunc = MBD, ns = 0.01) {
   # This function calculates the error ratios for the uncontaminated model
   # params:
   #   rho: Correlation parameter
@@ -41,7 +41,7 @@ uncontaminated_rates <- function(
 }
 
 calculate_rates <- function(
-    rho, k = 10, model = magnitude, method = Outlier.boot, M = 100, dfunc = MBD,
+    rho, k = 10, model = magnitude, method = outlier_bootstrap, M = 100, dfunc = MBD,
     boot = SmBoD) {
   # This function calculates the error ratios for the contaminated models
   # params:
@@ -135,7 +135,7 @@ calculate_rates <- function(
 
 
 calculate_rates_full_contamination <- function(
-    rho, k1 = 10, k2 = 4, k3 = 10, method = Outlier.boot, M = 100, dfunc = MBD,
+    rho, k1 = 10, k2 = 4, k3 = 10, method = outlier_bootstrap, M = 100, dfunc = MBD,
     boot = MBBo) {
   # This function calculates the error ratios for the contaminated model with all types of contamination
   # params:
