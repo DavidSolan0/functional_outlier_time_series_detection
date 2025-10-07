@@ -1,6 +1,7 @@
 #* Outlier Bootstrap
-outlier_bootstrap <- function(fdataobj, nb = 200, smo = 0.05, quan = 0.5,
-                              dfunc = MBD, l = 4, p = 0.1, ns = 0.01, boot = SmBoD) {
+outlier_bootstrap <- function(
+    fdataobj, nb = 200, smo = 0.05, quan = 0.5,
+    dfunc = MBD, l = 4, p = 0.1, ns = 0.01, boot = SmBoD) {
   # This function implements outlier detection using bootstrap procedures
   # params:
   #   fdataobj: Functional data object to analyze
@@ -106,8 +107,9 @@ outlier_bootstrap <- function(fdataobj, nb = 200, smo = 0.05, quan = 0.5,
   ))
 }
 
-#* FBox
-FBox <- function(fdataobj, dfunc = MBD, boot = boot) {
+#* functional_boxplot_outlier_detection_method
+functional_boxplot_outlier_detection_method <- function(
+    fdataobj, dfunc = MBD, boot = boot) {
   # This function implements outlier detection using functional boxplots
   # params:
   #   fdataobj: Functional data object to analyze
@@ -138,7 +140,7 @@ FBox <- function(fdataobj, dfunc = MBD, boot = boot) {
     } else {
       # Update outliers list and remove from data
       all_outliers <- c(all_outliers, current_outliers)
-      data <- data[-current_outliers,]
+      data <- data[-current_outliers, ]
     }
   }
 
