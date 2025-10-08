@@ -94,3 +94,65 @@ outlier_multivariate_bootstrap <- function(
     quantile = cutoff, Dep = dtotal
   ))
 }
+
+
+#* functional_boxplot_outlier_detection_method
+multivariate_functional_boxplot_outlier_detection_method <- function(
+    mfdataobj, dfunc = multiMBD, weights = NULL, ...) {
+  # This function implements outlier detection using functional boxplots
+  # params:
+  #   mfdataobj: Functional data object to analyze
+  #   dfunc: Depth function to use for outlier detection
+  #   weights: Vector of weights for each univariate process
+  # returns:
+  #   list containing:
+  #     outliers: Vector of detected outlier indices
+
+  # Ensure input is multivariate functional data object
+  if (!is.list(mfdataobj)) {
+    mfdataobj <- list(mfdataobj)
+  }
+
+  # Set default weights if not provided
+  if (is.null(weights)) {
+    weights <- rep(1/length(mfdataobj), length(mfdataobj))
+  }
+
+  # Initialize variables
+  all_outliers <- c()
+  has_outliers <- TRUE
+  pct_outliers <- 0
+
+  while (has_outliers && (nrow(mfdataobj[[1]]) > 0)) {
+    # Calculate depths and find outliers
+    depths <- dfunc(mfdataobj, weights = weights)
+
+    # Initialize vector for current outliers
+    current_outliers <- c()
+
+    # Check each component for outliers
+    for (i in seq_along(mfdataobj)) {
+
+      # Calculate outliers using functional boxplot
+      fbplot_result <- fda::fbplot(
+        t(mfdataobj[[i]]),
+        plot = FALSE, depth = depths
+      )
+
+      # Update vector for outliers
+      current_outliers <- unique(c(current_outliers, fbplot_result$outpoint))
+    }
+
+    if (length(current_outliers) == 0) {
+      has_outliers <- FALSE
+    } else {
+      # Update outliers list and remove from each component
+      all_outliers <- c(all_outliers, current_outliers)
+      for (i in seq_along(mfdataobj)) {
+        mfdataobj[[i]] <- mfdataobj[[i]][-current_outliers, ]
+      }
+    }
+  }
+
+  return(list(outliers = all_outliers))
+}

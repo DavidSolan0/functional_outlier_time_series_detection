@@ -40,7 +40,7 @@ calculate_rates_multivariate <- function(
     fdataobj <- fit$mfdataobj
 
     # Get observed outliers
-    g <- fit$outliers
+    generated_outliers <- fit$outliers
 
     # Detect outliers
     resultado <- method(fdataobj, dfunc = dfunc, boot = boot, weights = weights)
@@ -48,15 +48,16 @@ calculate_rates_multivariate <- function(
     # Get detected outliers
     detected_outliers <- as.numeric(resultado$outliers)
 
+    # Get cutoff
     cutoff_vector[l] <- resultado$quantile
 
     false_positive_rate <- 0
     true_positive_rate <- 0
     if (length(detected_outliers) > 0) {
       # Count true and false positives
-      denominator <- 200 - length(g)
-      is_true_positive <- detected_outliers %in% g
-      true_positive_rate <- sum(is_true_positive) / length(g)
+      denominator <- 200 - length(generated_outliers)
+      is_true_positive <- detected_outliers %in% generated_outliers
+      true_positive_rate <- sum(is_true_positive) / length(generated_outliers)
       false_positive_rate <- sum(!is_true_positive) / denominator
 
       # Store rates for this simulation
