@@ -109,12 +109,11 @@ outlier_bootstrap <- function(
 
 #* functional_boxplot_outlier_detection_method
 functional_boxplot_outlier_detection_method <- function(
-    fdataobj, dfunc = MBD, boot = boot) {
+    fdataobj, dfunc = MBD, ...) {
   # This function implements outlier detection using functional boxplots
   # params:
   #   fdataobj: Functional data object to analyze
   #   dfunc: Depth function to use for outlier detection
-  #   boot: Bootstrap procedure to estimate cutoff
   # returns:
   #   list containing:
   #     outliers: Vector of detected outlier indices

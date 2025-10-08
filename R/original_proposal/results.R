@@ -1,27 +1,29 @@
 library(fda)
 library(knitr)
-# library(tcltk)  # Commented out - requires XQuartz on macOS
 library(roahd)
 library(dplyr)
 library(fda.usc)
 library(mrfDepth)
 
-# workspace = 'C:/Users/David.Solano/OneDrive - Ipsos/David/functional_time_series_outlier_detection'
-# setwd(workspace)
 
-source("original_proposal/utils.R")
-source("original_proposal/simulated-models.R")
-source("original_proposal/depths.R")
-source("original_proposal/bootstrap-procedures.R")
-source("original_proposal/outlier-detection-procedures.R")
-source("original_proposal/power-study-functions.R")
-source("original_proposal/calculate_rates_results.R")
+
+# Load global functions
+source("R/utils.R")
+source("R/simulated-models.R")
+source("R/depths.R")
+source("R/calculate_rates_results.R")
+
+# Load local functions
+source("R/original_proposal/bootstrap-procedures.R")
+source("R/original_proposal/outlier-detection-procedures.R")
+source("R/original_proposal/power-study-functions.R")
+
 
 #* Parameters
 M <- 100
 seed <- 1234
-depths <- c(BD)
-depth_names <- c("MD")
+depths <- c(MBD)
+depth_names <- c("MBD")
 nn <- length(depths)
 outlier_detection_method <- outlier_bootstrap
 bootstrap_estimation_method <- MBBo

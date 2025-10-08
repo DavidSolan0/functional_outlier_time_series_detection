@@ -71,14 +71,14 @@ MBBo <- function(x, l = 4, nb = 200, dfunc = MBD, ns = 0.01, smo = 0) {
 
   # Get number of functional data objects
   # and block size
-  n <- nrow._data(x)
+  n <- nrow.fdata(x)
   k <- ceiling(n / l)
 
   # Calculate depths and trim the sample by removing outliers
   # using naive approach (fbplot)
   depths <- dfunc(x[["data"]])
   trimmed_sample <- clean_outliers(x, depths)
-  nn <- nrow_fdata(trimmed_sample)
+  nn <- nrow.fdata(trimmed_sample)
 
   # Initialize vector for quantiles
   i <- 1:(nn - l + 1)
@@ -127,14 +127,14 @@ StBo <- function(x, p = 0.1, nb = 200, dfunc = MBD, ns = 0.01, smo = 0) {
 
   # Get number of functional data objects
   # and block size
-  n <- nrow._data(x)
+  n <- nrow.fdata(x)
   k <- ceiling(n / l)
 
   # Calculate depths and trim the sample by removing outliers
   # using naive approach (fbplot)
   depths <- dfunc(x[["data"]])
   trimmed_sample <- clean_outliers(x, depths)
-  nn <- nrow_fdata(trimmed_sample)
+  nn <- nrow.fdata(trimmed_sample)
 
   # Initialize vector for indices
   i <- 1:nn
