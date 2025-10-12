@@ -11,6 +11,7 @@ library(CerioliOutlierDetection)
 source("R/utils.R")
 source("R/depths.R")
 source("R/simulated-models.R")
+source("R/calculate_rates_results.R")
 
 # Load local functions
 source("R/dirout/dirout.R")
@@ -19,22 +20,67 @@ source("R/dirout/outlier-detection-procedures.R")
 source("R/dirout/power-study-functions.R")
 
 
+#* Parameters
+M <- 100
+seed <- 1234
+rho <- 0.8
+dfunc <- "RP"
+boot <- MBBo.DirOut
+method <- outlier_dirout
 
 #* Uncontaminated
 K <- 0
-tabla <- run_simulation_dirout(K)
+tabla <- run_simulation_dirout(
+    K,
+    rho = rho,
+    method = method,
+    M = M,
+    dfunc = dfunc,
+    boot = boot,
+    seed = seed
+)
+tabla
 
 #* Magnitude
 K <- c(10, 15, 20, 25)
-tabla <- run_simulation_dirout(K)
+tabla <- run_simulation_dirout(
+    K,
+    rho = rho,
+    method = method,
+    M = M,
+    dfunc = dfunc,
+    boot = boot,
+    seed = seed
+)
+tabla
 
 #* Shape
 K <- c(4, 5, 6, 7)
-tabla <- run_simulation_dirout(K, model = shape)
+tabla <- run_simulation_dirout(
+    K,
+    rho = rho,
+    method = method,
+    M = M,
+    dfunc = dfunc,
+    boot = boot,
+    model = shape,
+    seed = seed
+)
+tabla
 
 #* Partial
 K <- c(10, 15, 20, 25)
-tabla <- run_simulation_dirout(K, model = partial)
+tabla <- run_simulation_dirout(
+    K,
+    rho = rho,
+    method = method,
+    M = M,
+    dfunc = dfunc,
+    boot = boot,
+    seed = seed,
+    model = partial
+)
+tabla
 
 # #* Mixed
 
