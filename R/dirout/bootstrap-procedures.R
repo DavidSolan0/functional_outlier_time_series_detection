@@ -1,4 +1,4 @@
-MBBo.DirOut <- function(x, l = 4, nb = 200, ns = 0.99, smo = 0, dfunc = "RP") {
+MBBo.DirOut <- function(x, l = 4, nb = 200, ns = 0.99, dfunc = "RP", ...) {
   # This function implements the moving blocks bootstrap procedure for DirOut
   # outlier detection
   # params:
@@ -6,7 +6,6 @@ MBBo.DirOut <- function(x, l = 4, nb = 200, ns = 0.99, smo = 0, dfunc = "RP") {
   #   l: Block size for sampling
   #   nb: Number of bootstrap samples to generate
   #   ns: Quantile used for cutoff estimation
-  #   smo: Smoothness parameter for adding noise
   #   dfunc: Depth function to use ("RP", "MhD", "SD", or "HS")
   # returns:
   #   list containing:
@@ -57,7 +56,7 @@ MBBo.DirOut <- function(x, l = 4, nb = 200, ns = 0.99, smo = 0, dfunc = "RP") {
 }
 
 StBo_DirOut <- function(
-    x, p = 0.1, nb = 200, dfunc = "RP", ns = 0.01, smo = 0) {
+    x, p = 0.1, nb = 200, dfunc = "RP", ns = 0.01, ...) {
   # This function implements the stationary bootstrap procedure for DirOut
   # outlier detection
   # params:
@@ -66,7 +65,6 @@ StBo_DirOut <- function(
   #   nb: Number of bootstrap samples to generate
   #   dfunc: Depth function to use ("RP", "MhD", "SD", or "HS")
   #   ns: Quantile used for cutoff estimation
-  #   smo: Smoothness parameter for adding noise
   # returns:
   #   list containing:
   #     q_avr: Vector of cutoff values for average directional outlyingness
