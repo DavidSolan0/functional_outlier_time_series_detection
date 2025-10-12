@@ -5,6 +5,7 @@ outlier_dirout <- function(
     l = 4,
     ns = 0.99,
     dfunc = "RP",
+    smo = 0,
     boot = MBBo.DirOut) {
   # This function implements outlier detection using DirOut
   # params:
@@ -37,11 +38,6 @@ outlier_dirout <- function(
     stop("fdataobj contain ", sum(nas1), " curves with some NA value \n")
   }
 
-  # Extract data, arguments, and range values
-  x <- fdataobj[["data"]]
-  tt <- fdataobj[["argvals"]]
-  rtt <- fdataobj[["rangeval"]]
-
   # Get number of functional data objects and block size
   n <- nrow(fdataobj)
   m <- ncol(fdataobj)
@@ -53,7 +49,7 @@ outlier_dirout <- function(
   }
 
   # Calculate cutoff
-  qs <- boot(fdataobj, nb = nb, smo = smo, ns = ns, dfunc = dfunc)
+  qs <- boot(fdataobj, nb = nb, ns = ns, dfunc = dfunc, smo = smo)
   cutoff_avr <- quantile(qs$q_avr, probs = quan)
   cutoff_var <- quantile(qs$q_var, probs = quan)
 
@@ -62,8 +58,9 @@ outlier_dirout <- function(
   curvasgood <- fdataobj
 
   # Calculate DirOut results
-  d_avr <- DirOut(curvasgood[["data"]])$out_avr
-  d_var <- DirOut(curvasgood[["data"]])$out_var
+  DirOut.Obj <- DirOut(curvasgood[["data"]], depth.dir = dfunc)
+  d_avr <- DirOut.Obj$out_avr
+  d_var <- DirOut.Obj$out_var
 
   # Calculate outliers based on average directional outlyingness
   cutt <- cutoff_avr < d_avr
