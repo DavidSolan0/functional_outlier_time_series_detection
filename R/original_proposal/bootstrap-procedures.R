@@ -57,14 +57,14 @@ SmBoD <- function(x, dfunc = MBD, nb = 200, smo = 0.05, ns = 0.01) {
   return(cuantiles)
 }
 
-MBBo <- function(x, l = 4, nb = 200, dfunc = MBD, ns = 0.01, smo = 0) {
-  # This function implements the moving blocks bootstrap procedure for outlier detection
+MBBo <- function(x, l = 4, nb = 200, dfunc = MBD, ns = 0.01, ...) {
+  # This function implements the moving blocks bootstrap procedure for 
+  # outlier detection
   # params:
   #   x: Functional data object to analyze
   #   l: Block size for sampling
   #   dfunc: Depth function to use for outlier detection
   #   nb: Number of bootstrap samples to generate
-  #   smo: Smoothness parameter for adding noise
   #   ns: Quantile used for cutoff estimation
   # returns:
   #   cuantiles: Vector of cutoff values from bootstrap samples
@@ -113,14 +113,14 @@ MBBo <- function(x, l = 4, nb = 200, dfunc = MBD, ns = 0.01, smo = 0) {
   return(cuantiles)
 }
 
-StBo <- function(x, p = 0.1, nb = 200, dfunc = MBD, ns = 0.01, smo = 0) {
-  # This function implements the stationary bootstrap procedure for outlier detection
+StBo <- function(x, p = 0.1, nb = 200, dfunc = MBD, ns = 0.01, ...) {
+  # This function implements the stationary bootstrap procedure for 
+  # outlier detection
   # params:
   #   x: Functional data object to analyze
   #   p: Success probability for geometric distribution
   #   dfunc: Depth function to use for outlier detection
   #   nb: Number of bootstrap samples to generate
-  #   smo: Smoothness parameter for adding noise
   #   ns: Quantile used for cutoff estimation
   # returns:
   #   cuantiles: Vector of cutoff values from bootstrap samples
