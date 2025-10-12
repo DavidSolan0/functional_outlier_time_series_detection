@@ -62,7 +62,6 @@ run_simulation <- function(
       )
 
       names(vector) <- paste0(vector_names, "-", k)
-      tabla_K <- t(vector)
       tabla_depth <- cbind(tabla_depth, t(vector))
 
       iter <- iter + 1
@@ -144,7 +143,6 @@ run_simulation_multivariate <- function(
       )
 
       names(vector) <- paste0(vector_names, "-", k)
-      tabla_K <- t(vector)
       tabla_depth <- cbind(tabla_depth, t(vector))
 
       iter <- iter + 1
@@ -159,11 +157,23 @@ run_simulation_multivariate <- function(
 
 
 #* Helper function to run simulation and create table
-run_simulation_dirout <- function(K, model = magnitude, M = 100, seed = NULL) {
+run_simulation_dirout <- function(
+    K,
+    rho = 0.8,
+    model = magnitude,
+    method = outlier_dirout,
+    M = 100,
+    dfunc = "RP",
+    boot = MBBo.DirOut,
+    seed = NULL) {
   # This function runs a simulation study for outlier detection with
   # different depth functions and using DirOut method
   # params:
   #   K: Vector of contamination levels to test
+  #   rho: Correlation parameter
+  #   method: Outlier detection method
+  #   dfunc: Functional depth to use
+  #   boot: Bootstrap procedure to estimate the cutoff
   #   model: Function that generates the contaminated data
   #   M: Number of simulations
   #   seed: Random seed for reproducibility (optional)
@@ -181,29 +191,41 @@ run_simulation_dirout <- function(K, model = magnitude, M = 100, seed = NULL) {
 
   for (k in K) {
     # Run simulation with DirOut method
-    rates <- tasas.DirOut(0.8, model = model, k = k, M = M)
+    rates <- calculate_dirout_rates(
+      rho,
+      k = k,
+      model = model,
+      method = method,
+      M = M,
+      dfunc = dfunc,
+      boot = boot
+    )
 
     # Create vector of results
     # pf: False positive rate
     # pc: True positive rate
     # sd: Standard deviation of true positive rate
     # pdc: Clean detection rate
-    vector <- c(rates$pf, rates$pc, rates$sd, rates$pdc)
-    names(vector) <- paste0(c("pf", "pc", "sd", "pdc"), "-", k)
+    vector <- c(
+      rates$false_positive_rate,
+      rates$true_positive_rate,
+      rates$sd_true_positive_rate,
+      rates$true_positive_rate_zero_clean
+    )
+    names(vector) <- paste0(
+      c(
+        "false_positive_rate",
+        "true_positive_rate",
+        "sd_true_positive_rate",
+        "true_positive_rate_zero_clean"
+      ),
+      "-",
+      k
+    )
 
-    # Build table
-    # If table is empty, create it
-    if (is.null(tabla_depth)) {
-      tabla_depth <- t(vector)
-    } else {
-      # If table is not empty, add results to it
-      tabla_depth <- cbind(tabla_depth, t(vector))
-    }
+    tabla_depth <- cbind(tabla_depth, t(vector))
   }
 
-  # Format final table
-  # Add row names
-  # Convert table to data frame
   tabla <- tabla_depth
   row.names(tabla) <- "DirOut"
   tabla <- tabla %>% data.frame()
