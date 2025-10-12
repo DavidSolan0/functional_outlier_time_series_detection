@@ -6,7 +6,8 @@ outlier_bootstrap <- function(
   # params:
   #   fdataobj: Functional data object to analyze
   #   nb: Number of bootstrap samples to generate
-  #   smo: Smoothness parameter for adding noise
+  #   smo: Smoothness parameter for adding noise. Only used for 
+  #     SmBoD bootstrap.
   #   quan: Quantile used for cutoff estimation from bootstrap
   #   dfunc: Depth function to use for outlier detection
   #   l: Block size (only used for MBBo bootstrap)
