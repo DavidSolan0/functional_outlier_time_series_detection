@@ -45,7 +45,6 @@ DirOut <- function(
     # Multivariate cases #
     #####################
 
-
     if (length(temp) == 3) {
         n <- temp[1]
         p <- temp[2]
