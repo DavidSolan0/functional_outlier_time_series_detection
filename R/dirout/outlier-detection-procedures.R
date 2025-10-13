@@ -100,12 +100,13 @@ outlier_dirout <- function(
 
     # Get unique outliers
     elim <- unique(c(elim_avr, elim_var))
+    fecha <- rownames(curvasgood[["data"]])[elim]
 
     # Clean dataset
     curvasgood <- curvasgood[-elim, ]
 
     # Update outliers
-    outliers <- c(outliers, elim)
+    outliers <- c(outliers, fecha)
 
     # Check if there are no outliers or if there are more than 20% of the data
     if (length(elim) == 0) {
@@ -118,9 +119,6 @@ outlier_dirout <- function(
     ite <- c(ite, rep(ii, length(elim)))
     ii <- ii + 1
   }
-
-  # Get the names of the outliers
-  outliers <- rownames(fdataobj[["data"]])[outliers]
 
   # Return the outliers, the depths of the outliers,
   # the indices of the iterations, the cutoff, and the depths
@@ -241,12 +239,13 @@ multivariate_outlier_dirout <- function(
 
     # Get unique outliers
     elim <- unique(c(elim_avr, elim_var))
+    fecha <- rownames(curvasgood)[elim]
 
     # Clean dataset
     curvasgood <- curvasgood[-elim, , ]
 
     # Update outliers
-    outliers <- c(outliers, elim)
+    outliers <- c(outliers, fecha)
 
     # Check if there are no outliers or if there are more than 20% of the data
     if (length(elim) == 0) {
@@ -260,8 +259,6 @@ multivariate_outlier_dirout <- function(
     ite <- c(ite, rep(ii, length(elim)))
     ii <- ii + 1
   }
-
-  outliers <- rownames(fdataobj)[outliers]
 
   # Return results
   return(list(
