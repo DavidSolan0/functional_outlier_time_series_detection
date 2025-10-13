@@ -15,9 +15,6 @@ SmBoD <- function(x, dfunc = MBD, nb = 200, smo = 0.05, ns = 0.01) {
   }
 
   # Extract data, arguments, and range values
-  dat <- x[["data"]]
-  tt <- x[["argvals"]]
-  rtt <- x[["rangeval"]]
   n <- nrow(x)
   m <- ncol(x)
 
