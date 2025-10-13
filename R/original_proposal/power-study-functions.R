@@ -91,7 +91,7 @@ calculate_rates <- function(
     resultado <- method(fdataobj, dfunc = dfunc, boot = boot)
 
     # Get detected outliers
-    detected_outliers <- resultado$outliers
+    detected_outliers <- as.numeric(resultado$outliers)
 
     # Get estimated cutoff
     cut_off_vector[l] <- resultado$quantile
