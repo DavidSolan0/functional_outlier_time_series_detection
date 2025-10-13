@@ -25,8 +25,8 @@ seed <- 1234
 depths <- c(multiMBD)
 depth_names <- c("multiMBD")
 nn <- length(depths)
-outlier_detection_method <- multivariate_functional_boxplot_outlier_detection_method
-bootstrap_estimation_method <- NULL
+outlier_detection_method <- outlier_multivariate_bootstrap
+bootstrap_estimation_method <- multiMBBo
 
 #* Magnitude
 K <- c(10, 15, 20, 25)
