@@ -165,6 +165,7 @@ run_simulation_dirout <- function(
     M = 100,
     dfunc = "RP",
     boot = MBBo.DirOut,
+    multivariate = FALSE,
     seed = NULL) {
   # This function runs a simulation study for outlier detection with
   # different depth functions and using DirOut method
@@ -198,7 +199,8 @@ run_simulation_dirout <- function(
       method = method,
       M = M,
       dfunc = dfunc,
-      boot = boot
+      boot = boot,
+      multivariate = multivariate
     )
 
     # Create vector of results
@@ -228,7 +230,7 @@ run_simulation_dirout <- function(
 
   tabla <- tabla_depth
   row.names(tabla) <- "DirOut"
-  tabla <- tabla %>% data.frame()
+  tabla <- data.frame(tabla)
 
   return(tabla)
 }
