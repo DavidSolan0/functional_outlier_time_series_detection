@@ -120,3 +120,66 @@ StBo_DirOut <- function(
   }
   return(list(q_avr = cuantiles.avr, q_var = cuantiles.var))
 }
+
+
+multiMBBo.DirOut <- function(x, l = 4, nb = 200, ns = 0.99, dfunc = "RP", ...) {
+  # This function implements the moving blocks bootstrap procedure for DirOut
+  # outlier detection
+  # params:
+  #   x: Array to analyze
+  #   l: Block size for sampling
+  #   nb: Number of bootstrap samples to generate
+  #   ns: Quantile used for cutoff estimation
+  #   dfunc: Depth function to use ("RP", "MhD", "SD", or "HS")
+  # returns:
+  #   list containing:
+  #     q_avr: List of vectors of cutoff values for average directional outlyingness
+  #     q_var: Vector of cutoff values for variance of directional outlyingness
+
+  # Get number of observations and block size
+  n <- dim(x)[1]
+  k <- ceiling(n / l)
+  p <- dim(x)[3] # Number of variables
+
+  # Initialize indices for block sampling
+  i <- 1:(n - l + 1)
+
+  # Initialize vectors for quantiles
+  cuantiles.avr <- vector("list", p)
+  for (v in 1:p) {
+    cuantiles.avr[[v]] <- numeric(nb)
+  }
+  cuantiles.var <- numeric(nb)
+
+  # Loop through bootstrap samples
+  for (j in 1:nb) {
+    # Sample indices with replacement with a discrete uniform distribution
+    idx_sample <- runifdisc(k, min = min(i), max = max(i))
+
+    # Initialize vector for indices
+    sample_b_idx <- c()
+
+    # Generate blocks of indices
+    for (m in 1:k) {
+      sample_b_idx <- c(sample_b_idx, block_i_generator(idx_sample[m], l = l))
+    }
+
+    # Keep only the first n indices
+    sample_b_idx <- sample_b_idx[1:n]
+    sample_b <- x[sample_b_idx, , ]
+
+    # Calculate directional outlyingness measures
+    DirOut.Obj <- DirOut(sample_b, depth.dir = dfunc)
+
+    # Handle multiple average outlyingness values
+    for (v in 1:p) {
+      d.avr <- DirOut.Obj$out_avr[, v]
+      cuantiles.avr[[v]][j] <- quantile(d.avr, probs = ns, type = 8)
+    }
+
+    # Calculate variance quantile
+    d.var <- DirOut.Obj$out_var
+    cuantiles.var[j] <- quantile(d.var, probs = ns, type = 8)
+  }
+  return(list(q_avr = cuantiles.avr, q_var = cuantiles.var))
+}
