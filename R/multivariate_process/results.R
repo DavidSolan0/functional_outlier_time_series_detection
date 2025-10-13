@@ -40,7 +40,7 @@ tabla <- run_simulation_multivariate(
     seed = seed,
     model = magnitude,
     model_name = " (Magnitude model)",
-    weights = c(1, 0, 0),
+    # weights = c(1, 0, 0),
 )
 tabla
 
@@ -56,7 +56,7 @@ tabla <- run_simulation_multivariate(
     seed = seed,
     model = shape,
     model_name = " (Shape model)",
-    weights = c(1 / 3, 1 / 3, 1 / 3),
+    # weights = c(1 / 3, 1 / 3, 1 / 3),
 )
 tabla
 
@@ -72,6 +72,6 @@ tabla <- run_simulation_multivariate(
     seed = seed,
     model = shape,
     model_name = " (Partial model)",
-    weights = c(1 / 3, 1 / 3, 1 / 3)
+    # weights = c(1 / 3, 1 / 3, 1 / 3)
 )
 tabla
