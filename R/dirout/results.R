@@ -87,15 +87,11 @@ tabla
 #** Multivariate model **#
 
 #* Parameters
-M <- 5
-seed <- 1234
-rho <- 0.8
-dfunc <- "RP"
 boot <- multiMBBo.DirOut
 method <- multivariate_outlier_dirout
 
 #* Magnitude
-K <- c(10)
+K <- c(10, 15, 20, 25)
 tabla <- run_simulation_dirout(
     K,
     rho = rho,
@@ -110,7 +106,7 @@ tabla <- run_simulation_dirout(
 tabla
 
 #* Shape
-K <- c(4)
+K <- c(4, 5, 6, 7)
 tabla <- run_simulation_dirout(
     K,
     rho = rho,
