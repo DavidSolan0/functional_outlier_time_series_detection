@@ -20,6 +20,8 @@ source("R/dirout/outlier-detection-procedures.R")
 source("R/dirout/power-study-functions.R")
 
 
+#** Univariate model **#
+
 #* Parameters
 M <- 100
 seed <- 1234
@@ -79,6 +81,61 @@ tabla <- run_simulation_dirout(
     boot = boot,
     seed = seed,
     model = partial
+)
+tabla
+
+#** Multivariate model **#
+
+#* Parameters
+M <- 5
+seed <- 1234
+rho <- 0.8
+dfunc <- "RP"
+boot <- multiMBBo.DirOut
+method <- multivariate_outlier_dirout
+
+#* Magnitude
+K <- c(10)
+tabla <- run_simulation_dirout(
+    K,
+    rho = rho,
+    method = method,
+    M = M,
+    dfunc = dfunc,
+    boot = boot,
+    seed = seed,
+    model = magnitude,
+    multivariate = TRUE
+)
+tabla
+
+#* Shape
+K <- c(4)
+tabla <- run_simulation_dirout(
+    K,
+    rho = rho,
+    method = method,
+    M = M,
+    dfunc = dfunc,
+    boot = boot,
+    seed = seed,
+    model = shape,
+    multivariate = TRUE
+)
+tabla
+
+#* Partial
+K <- c(10, 15, 20, 25)
+tabla <- run_simulation_dirout(
+    K,
+    rho = rho,
+    method = method,
+    M = M,
+    dfunc = dfunc,
+    boot = boot,
+    seed = seed,
+    model = partial,
+    multivariate = TRUE
 )
 tabla
 
