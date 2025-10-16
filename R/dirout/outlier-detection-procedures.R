@@ -178,23 +178,17 @@ multivariate_outlier_dirout <- function(
   }
 
   # Calculate cutoffs
-  qs <- boot(fdataobj, nb = nb, ns = ns, dfunc = dfunc)
+  qs <- boot(fdataobj, l = l, nb = nb, ns = ns, dfunc = dfunc)
   cutoff_avr <- lapply(qs$q_avr, function(x) quantile(x, probs = quan))
   cutoff_var <- quantile(qs$q_var, probs = quan)
 
   # Initialize variables
-  hay <- 1
   dep.out_avr <- dep.out_var <- c()
-  outliers <- c()
-  ite <- c()
-  ii <- 1
-  curvasgood <- fdataobj
 
   # Calculate DirOut results
-  DirOut.Obj <- DirOut(curvasgood, depth.dir = dfunc)
+  DirOut.Obj <- DirOut(fdataobj, depth.dir = dfunc)
   d_avr <- DirOut.Obj$out_avr
   d_var <- DirOut.Obj$out_var
-
 
   if (plot == TRUE) {
     # Create a plot for each column of d_avr against d_var
@@ -213,52 +207,32 @@ multivariate_outlier_dirout <- function(
     par(mfrow = c(1, 1))
   }
 
-  while (hay == 1) {
-    # Calculate outliers based on average directional
-    # outlyingness for each variable
-    elim_avr <- c()
-    for (v in 1:p) {
-      cutt <- cutoff_avr[[v]] < d_avr[, v]
-      elim_avr_v <- which(cutt)
-
-      # If there are any outliers, add them to the list
-      if (length(elim_avr_v) > 0) {
-        dep.out_avr <- c(dep.out_avr, d_avr[elim_avr_v, v])
-        elim_avr <- c(elim_avr, elim_avr_v)
-      }
-    }
-
-    # Calculate outliers based on variance of directional outlyingness
-    cutt <- cutoff_var < d_var
-    elim_var <- which(cutt)
+  # Calculate outliers based on average directional
+  # outlyingness for each variable
+  elim_avr <- c()
+  for (v in 1:p) {
+    cutt <- cutoff_avr[[v]] < d_avr[, v]
+    elim_avr_v <- which(cutt)
 
     # If there are any outliers, add them to the list
-    if (length(elim_var) > 0) {
-      dep.out_var <- c(dep.out_var, d_var[elim_var])
+    if (length(elim_avr_v) > 0) {
+      dep.out_avr <- c(dep.out_avr, d_avr[elim_avr_v, v])
+      elim_avr <- c(elim_avr, elim_avr_v)
     }
-
-    # Get unique outliers
-    elim <- unique(c(elim_avr, elim_var))
-    fecha <- rownames(curvasgood)[elim]
-
-    # Clean dataset
-    curvasgood <- curvasgood[-elim, , ]
-
-    # Update outliers
-    outliers <- c(outliers, fecha)
-
-    # Check if there are no outliers or if there are more than 20% of the data
-    if (length(elim) == 0) {
-      hay <- 0
-    } else {
-      DirOut.Obj <- DirOut(curvasgood, depth.dir = dfunc)
-      d_avr <- DirOut.Obj$out_avr
-      d_var <- DirOut.Obj$out_var
-    }
-
-    ite <- c(ite, rep(ii, length(elim)))
-    ii <- ii + 1
   }
+
+  # Calculate outliers based on variance of directional outlyingness
+  cutt <- cutoff_var < d_var
+  elim_var <- which(cutt)
+
+  # If there are any outliers, add them to the list
+  if (length(elim_var) > 0) {
+    dep.out_var <- c(dep.out_var, d_var[elim_var])
+  }
+
+  # Get unique outliers
+  elim <- unique(c(elim_avr, elim_var))
+  outliers <- rownames(fdataobj)[elim]
 
   # Return results
   return(list(
@@ -266,7 +240,6 @@ multivariate_outlier_dirout <- function(
     dep.out_avr = dep.out_avr,
     dep.out_var = dep.out_var,
     q_avr = cutoff_avr,
-    q_var = cutoff_var,
-    iteration = ite
+    q_var = cutoff_var
   ))
 }
