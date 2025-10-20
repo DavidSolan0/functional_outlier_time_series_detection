@@ -46,7 +46,7 @@ calculate_rates_multivariate <- function(
     resultado <- method(fdataobj, dfunc = dfunc, boot = boot, weights = weights)
 
     # Get detected outliers
-    detected_outliers <- as.numeric(resultado$outliers)
+    detected_outliers <- as.numeric(unique(resultado$outliers))
 
     # Get cutoff
     cutoff_vector[l] <- resultado$quantile
