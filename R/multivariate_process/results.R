@@ -70,7 +70,7 @@ tabla <- run_simulation_multivariate(
     outlier_detection_method = outlier_detection_method,
     bootstrap_estimation_method = bootstrap_estimation_method,
     seed = seed,
-    model = shape,
+    model = partial,
     model_name = " (Partial model)",
     # weights = c(1 / 3, 1 / 3, 1 / 3)
 )
