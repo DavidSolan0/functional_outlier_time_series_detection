@@ -97,7 +97,7 @@ outlier_multivariate_bootstrap <- function(
 
 
 #* functional_boxplot_outlier_detection_method
-multivariate_functional_boxplot_outlier_detection_method <- function(
+multivariate_functional_boxplot <- function(
     mfdataobj, dfunc = multiMBD, weights = NULL, ...) {
   # This function implements outlier detection using functional boxplots
   # params:
