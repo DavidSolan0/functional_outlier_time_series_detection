@@ -234,3 +234,84 @@ run_simulation_dirout <- function(
 
   return(tabla)
 }
+
+
+#* Helper function to run simulation and create table for sliding window approach
+run_simulation_sliding_window <- function(
+    K,
+    rho = 0.8,
+    model = magnitude,
+    window_size = 8,
+    M = 100,
+    dfunc = "RP",
+    boot = SlidingWindow.DirOut,
+    multivariate = FALSE,
+    seed = NULL) {
+  # This function runs a simulation study for outlier detection using
+  # sliding window approach with functional depth
+  # params:
+  #   K: Vector of contamination levels to test
+  #   rho: Correlation parameter
+  #   model: Function that generates the contaminated data
+  #   window_size: Size of the symmetric window (default 8)
+  #   M: Number of simulations
+  #   dfunc: Functional depth to use
+  #   boot: Bootstrap procedure to estimate the cutoff
+  #   multivariate: Whether to use multivariate data (TRUE) or univariate (FALSE)
+  #   seed: Random seed for reproducibility (optional)
+  # returns:
+  #   tabla: Matrix containing false positive rates, true positive rates,
+  #         standard deviations and clean detection rates for each K value
+
+  # Set seed if provided
+  if (!is.null(seed)) {
+    set.seed(seed)
+  }
+
+  # Initialize table
+  tabla_depth <- NULL
+
+  for (k in K) {
+    # Run simulation with sliding window method
+    rates <- calculate_sliding_window_rates(
+      rho,
+      k = k,
+      model = model,
+      window_size = window_size,
+      M = M,
+      dfunc = dfunc,
+      boot = boot,
+      multivariate = multivariate
+    )
+
+    # Create vector of results
+    # pf: False positive rate
+    # pc: True positive rate
+    # sd: Standard deviation of true positive rate
+    # pdc: Clean detection rate
+    vector <- c(
+      rates$false_positive_rate,
+      rates$true_positive_rate,
+      rates$sd_true_positive_rate,
+      rates$true_positive_rate_zero_clean
+    )
+    names(vector) <- paste0(
+      c(
+        "false_positive_rate",
+        "true_positive_rate",
+        "sd_true_positive_rate",
+        "true_positive_rate_zero_clean"
+      ),
+      "-",
+      k
+    )
+
+    tabla_depth <- cbind(tabla_depth, t(vector))
+  }
+
+  tabla <- tabla_depth
+  row.names(tabla) <- "SlidingWindow"
+  tabla <- data.frame(tabla)
+
+  return(tabla)
+}
