@@ -183,3 +183,86 @@ multiMBBo.DirOut <- function(x, l = 4, nb = 200, ns = 0.99, dfunc = "RP", ...) {
   }
   return(list(q_avr = cuantiles.avr, q_var = cuantiles.var))
 }
+
+SlidingWindow.DirOut <- function(x, window_size = 8, nb = 200, ns = 0.99, dfunc = "RP", ...) {
+  # This function implements a symmetric window bootstrap procedure for DirOut
+  # outlier detection in functional time series
+  # params:
+  #   x: Functional data object to analyze
+  #   window_size: Size of the symmetric window (default 8)
+  #   nb: Number of bootstrap samples to generate
+  #   ns: Quantile used for cutoff estimation
+  #   dfunc: Depth function to use ("RP", "MhD", "SD", or "HS")
+  # returns:
+  #   list containing:
+  #     q_avr: Vector of cutoff values for average directional outlyingness
+  #     q_var: Vector of cutoff values for variance of directional outlyingness
+  #     window_results: List containing results for each window position
+
+  # Get number of functional data objects
+  n <- nrow.fdata(x)
+
+  # Get data matrix
+  trimmed_sample <- x[["data"]]
+
+  # Calculate half window size for symmetric windows
+  half_window <- floor(window_size / 2)
+
+  # Initialize vectors for quantiles
+  cuantiles.avr <- numeric(nb)
+  cuantiles.var <- numeric(nb)
+
+  # Initialize list to store results for each window position
+  window_results <- list()
+
+  # Loop through bootstrap samples
+  for (j in 1:nb) {
+    # Initialize vectors to store aggregated results for this bootstrap iteration
+    bootstrap_avr <- numeric(n)
+    bootstrap_var <- numeric(n)
+    window_counts <- numeric(n) # Track how many windows each observation appears in
+
+    # For each observation, create a symmetric window around it
+    for (i in 1:n) {
+      # Calculate symmetric window boundaries
+      start_idx <- max(1, i - half_window)
+      end_idx <- min(n, i + half_window)
+
+      # Extract window data
+      window_data <- trimmed_sample[start_idx:end_idx, ]
+
+      # Calculate directional outlyingness measures for this window
+      DirOut.Obj <- DirOut(window_data, depth.dir = dfunc)
+      d.avr <- DirOut.Obj$out_avr
+      d.var <- DirOut.Obj$out_var
+
+      # Find the position of observation i in the window
+      obs_pos_in_window <- i - start_idx + 1
+
+      # Aggregate the directional outlyingness values for observation i
+      bootstrap_avr[i] <- bootstrap_avr[i] + d.avr[obs_pos_in_window]
+      bootstrap_var[i] <- bootstrap_var[i] + d.var[obs_pos_in_window]
+      window_counts[i] <- window_counts[i] + 1
+    }
+
+    # Average the aggregated values by the number of windows each observation appears in
+    bootstrap_avr <- bootstrap_avr / window_counts
+    bootstrap_var <- bootstrap_var / window_counts
+
+    # Calculate quantiles across all observations for this bootstrap iteration
+    cuantiles.avr[j] <- quantile(bootstrap_avr, probs = ns, type = 8)
+    cuantiles.var[j] <- quantile(bootstrap_var, probs = ns, type = 8)
+
+    # Store window results for analysis
+    if (j == 1) { # Only store for first iteration to avoid memory issues
+      window_results$avr <- bootstrap_avr
+      window_results$var <- bootstrap_var
+    }
+  }
+
+  return(list(
+    q_avr = cuantiles.avr,
+    q_var = cuantiles.var,
+    window_results = window_results
+  ))
+}
