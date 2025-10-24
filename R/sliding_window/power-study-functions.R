@@ -37,22 +37,15 @@ calculate_sliding_window_rates <- function(
       fit <- multifdata(rho = rho, model = model, k = k, plot = FALSE)
       mfdata <- fit$mfdataobj
 
-      # Convert list to array format required by multivariate_outlier_dirout
-      mfdata <- array(
-        unlist(mfdata),
-        dim = c(
-          dim(mfdata[[1]])[1],
-          dim(mfdata[[1]])[2],
-          length(mfdata)
-        )
-      )
-      ndata <- dim(mfdata)[1]
+      # Keep as list format for multivariate sliding window method
+      ndata <- nrow(mfdata[[1]])
 
       # Detect outliers using multivariate sliding window method
-      resultado <- sliding_window_outlier(
+      resultado <- multivariate_sliding_window_outlier(
         fdataobj = mfdata, 
         window_size = window_size,
-        dfunc = dfunc
+        dfunc = dfunc,
+        threshold = threshold
       )
     } else {
       # Univariate case
