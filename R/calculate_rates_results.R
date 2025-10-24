@@ -246,7 +246,8 @@ run_simulation_sliding_window <- function(
     dfunc = "RP",
     boot = SlidingWindow.DirOut,
     multivariate = FALSE,
-    seed = NULL) {
+    seed = NULL,
+    threshold = 0.5) {
   # This function runs a simulation study for outlier detection using
   # sliding window approach with functional depth
   # params:
@@ -281,7 +282,8 @@ run_simulation_sliding_window <- function(
       M = M,
       dfunc = dfunc,
       boot = boot,
-      multivariate = multivariate
+      multivariate = multivariate,
+      threshold = threshold
     )
 
     # Create vector of results
