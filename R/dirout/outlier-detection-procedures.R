@@ -4,7 +4,7 @@ outlier_dirout <- function(
     quan = 0.5,
     l = 4,
     ns = 0.99,
-    dfunc = "RP",
+    dfunc = "random_projections",
     smo = 0,
     boot = MBBo.DirOut,
     plot = FALSE) {
@@ -63,9 +63,9 @@ outlier_dirout <- function(
   curvasgood <- fdataobj
 
   # Calculate DirOut results
-  DirOut.Obj <- DirOut(curvasgood[["data"]], depth.dir = dfunc)
-  d_avr <- DirOut.Obj$out_avr
-  d_var <- DirOut.Obj$out_var
+  dir_out_result <- dir_out(curvasgood[["data"]], data_depth = dfunc)
+  d_avr <- dir_out_result$mean_outlyingness
+  d_var <- dir_out_result$var_outlyingness
 
   if (plot == TRUE) {
     plot(d_avr, d_var,
@@ -112,9 +112,9 @@ outlier_dirout <- function(
     if (length(elim) == 0) {
       hay <- 0
     } else {
-      DirOut.Obj <- DirOut(curvasgood[["data"]], depth.dir = dfunc)
-      d_avr <- DirOut.Obj$out_avr
-      d_var <- DirOut.Obj$out_var
+      dir_out_result <- dir_out(curvasgood[["data"]], data_depth = dfunc)
+      d_avr <- dir_out_result$mean_outlyingness
+      d_var <- dir_out_result$var_outlyingness
     }
     ite <- c(ite, rep(ii, length(elim)))
     ii <- ii + 1
@@ -139,7 +139,7 @@ multivariate_outlier_dirout <- function(
     quan = 0.5,
     l = 4,
     ns = 0.99,
-    dfunc = "RP",
+    dfunc = "random_projections",
     smo = 0,
     boot = multiMBBo.DirOut,
     plot = FALSE) {
@@ -186,9 +186,9 @@ multivariate_outlier_dirout <- function(
   dep.out_avr <- dep.out_var <- c()
 
   # Calculate DirOut results
-  DirOut.Obj <- DirOut(fdataobj, depth.dir = dfunc)
-  d_avr <- DirOut.Obj$out_avr
-  d_var <- DirOut.Obj$out_var
+  dir_out_result <- dir_out(fdataobj, data_depth = dfunc)
+  d_avr <- dir_out_result$mean_outlyingness
+  d_var <- dir_out_result$var_outlyingness
 
   if (plot == TRUE) {
     # Create a plot for each column of d_avr against d_var

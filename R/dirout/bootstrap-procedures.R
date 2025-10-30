@@ -1,4 +1,4 @@
-MBBo.DirOut <- function(x, l = 4, nb = 200, ns = 0.99, dfunc = "RP", ...) {
+MBBo.DirOut <- function(x, l = 4, nb = 200, ns = 0.99, dfunc = "random_projections", ...) {
   # This function implements the moving blocks bootstrap procedure for DirOut
   # outlier detection
   # params:
@@ -44,9 +44,9 @@ MBBo.DirOut <- function(x, l = 4, nb = 200, ns = 0.99, dfunc = "RP", ...) {
     sample_b <- trimmed_sample[sample_b_idx, ]
 
     # Calculate directional outlyingness measures
-    DirOut.Obj <- DirOut(sample_b, depth.dir = dfunc)
-    d.avr <- DirOut.Obj$out_avr
-    d.var <- DirOut.Obj$out_var
+    dir_out_result <- dir_out(sample_b, data_depth = dfunc)
+    d.avr <- dir_out_result$mean_outlyingness
+    d.var <- dir_out_result$var_outlyingness
 
     # Calculate quantiles
     cuantiles.avr[j] <- quantile(d.avr, probs = ns, type = 8)
@@ -56,7 +56,7 @@ MBBo.DirOut <- function(x, l = 4, nb = 200, ns = 0.99, dfunc = "RP", ...) {
 }
 
 StBo_DirOut <- function(
-    x, p = 0.1, nb = 200, dfunc = "RP", ns = 0.01, ...) {
+    x, p = 0.1, nb = 200, dfunc = "random_projections", ns = 0.01, ...) {
   # This function implements the stationary bootstrap procedure for DirOut
   # outlier detection
   # params:
@@ -110,9 +110,9 @@ StBo_DirOut <- function(
     sample_b <- trimmed_sample[b_i, ]
 
     # Calculate directional outlyingness measures
-    DirOut.Obj <- DirOut(sample_b, depth.dir = dfunc)
-    d.avr <- DirOut.Obj$out_avr
-    d.var <- DirOut.Obj$out_var
+    dir_out_result <- dir_out(sample_b, data_depth = dfunc)
+    d.avr <- dir_out_result$mean_outlyingness
+    d.var <- dir_out_result$var_outlyingness
 
     # Calculate quantiles
     cuantiles.avr[j] <- quantile(d.avr, probs = ns, type = 8)
@@ -122,7 +122,7 @@ StBo_DirOut <- function(
 }
 
 
-multiMBBo.DirOut <- function(x, l = 4, nb = 200, ns = 0.99, dfunc = "RP", ...) {
+multiMBBo.DirOut <- function(x, l = 4, nb = 200, ns = 0.99, dfunc = "random_projections", ...) {
   # This function implements the moving blocks bootstrap procedure for DirOut
   # outlier detection
   # params:
@@ -169,16 +169,16 @@ multiMBBo.DirOut <- function(x, l = 4, nb = 200, ns = 0.99, dfunc = "RP", ...) {
     sample_b <- x[sample_b_idx, , ]
 
     # Calculate directional outlyingness measures
-    DirOut.Obj <- DirOut(sample_b, depth.dir = dfunc)
+    dir_out_result <- dir_out(sample_b, data_depth = dfunc)
 
     # Handle multiple average outlyingness values
     for (v in 1:p) {
-      d.avr <- DirOut.Obj$out_avr[, v]
+      d.avr <- dir_out_result$mean_outlyingness[, v]
       cuantiles.avr[[v]][j] <- quantile(d.avr, probs = ns, type = 8)
     }
 
     # Calculate variance quantile
-    d.var <- DirOut.Obj$out_var
+    d.var <- dir_out_result$var_outlyingness
     cuantiles.var[j] <- quantile(d.var, probs = ns, type = 8)
   }
   return(list(q_avr = cuantiles.avr, q_var = cuantiles.var))
