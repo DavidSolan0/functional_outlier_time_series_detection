@@ -6,6 +6,7 @@ calculate_sliding_window_rates <- function(
     M = 100,
     dfunc = MBD,
     multivariate = FALSE,
+    threshold = 0.5,
     ...) {
   # This function calculates the error ratios for the contaminated models
   # using the sliding window approach
@@ -16,9 +17,9 @@ calculate_sliding_window_rates <- function(
   #   window_size: Size of the symmetric window (default 8)
   #   M: Number of simulations
   #   dfunc: Functional depth to use
-  #   boot: Bootstrap procedure to estimate the cutoff (SlidingWindow.DirOut)
   #   multivariate: Whether to use multivariate data (TRUE) or 
   #     univariate (FALSE)
+  #   threshold: Threshold for determining outliers based on window count (default 0.5)
   # returns:
   #   list containing:
   #     false_positive_rate: Mean false positive rate
@@ -57,7 +58,8 @@ calculate_sliding_window_rates <- function(
       resultado <- sliding_window_outlier(
         fdataobj = fdataobj, 
         window_size = window_size,
-        dfunc = dfunc
+        dfunc = dfunc,
+        threshold = threshold
       )
     }
 
