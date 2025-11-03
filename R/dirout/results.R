@@ -5,16 +5,15 @@ library(knitr)
 library(dplyr)
 library(fda.usc)
 library(mrfDepth)
+library(fdaoutlier)
 library(CerioliOutlierDetection)
 
 # Load global functions
 source("R/utils.R")
-source("R/depths.R")
 source("R/simulated-models.R")
 source("R/calculate_rates_results.R")
 
 # Load local functions
-source("R/dirout/dirout.R")
 source("R/dirout/bootstrap-procedures.R")
 source("R/dirout/outlier-detection-procedures.R")
 source("R/dirout/power-study-functions.R")
@@ -26,7 +25,7 @@ source("R/dirout/power-study-functions.R")
 M <- 100
 seed <- 1234
 rho <- 0.8
-dfunc <- "RP"
+dfunc <- "random_projections"
 boot <- MBBo.DirOut
 method <- outlier_dirout
 
