@@ -1,13 +1,124 @@
-# Functional outlier time series detection
+# Functional Outlier Time Series Detection
 
-This repo contains a proposal for functional time series outlier detection based on multivariate functional processes and functional depths.
+A comprehensive R implementation for detecting outliers in functional time series data using various depth-based and bootstrap methods.
 
-# [Orinigal proposal](https://github.com/DavidSolan0/functional_outlier_time_series_detection/tree/main/original_proposal)
+## Overview
 
-The original proposal offers two alternatives to detect functional time series outliers. One of them is a non-parametric approach based on bootstrap procedures. However, this approach must be more robust in seeing the shape outliers and partially contaminated observations. From calculus, derivatives offer us information about a function's shape. I took this principle to modify the initial idea and extended it to a multivariate environment looking to capture more details about curves' shapes. The following image shows us that the masking effect that some depth functions could suffer to detect shape outliers is avoided using the original process's first and second derivatives information.
+This repository provides multiple approaches for outlier detection in functional time series, extending the original proposal by Raña et al. (2015) with several enhancements:
 
-![image](https://user-images.githubusercontent.com/80591909/174551330-af6fa88f-4463-4483-ad27-a6677ef7e889.png)
+- **Bootstrap-based methods** for robust cutoff estimation
+- **Multivariate extensions** using derivative information for shape outlier detection
+- **Directional outlyingness (DirOut)** methods for comprehensive outlier characterization
+- **Sliding window approaches** for local outlier detection
 
-# [Multivariate extension]()
+## Available Methods
 
-From simulation studies and graphically it could be proof that derivatives information allows detection of shape outliers and partially contaminated observations with high precision and almost no error. However, this information could mask magnitude outliers. To sum up, this approach is strongly recommended if you are sure you do not have magnitude but shape outliers in your functional time series. 
+### 1. [Original Proposal](R/original_proposal/README.md)
+Bootstrap-based outlier detection methods following Raña et al. (2015):
+- **SmBoD**: Standard smoothed bootstrap on data
+- **MBBo**: Moving block bootstrap (for temporal dependence)
+- **StBo**: Stationary bootstrap
+
+**Best for**: General-purpose outlier detection, especially magnitude outliers.
+
+### 2. [Multivariate Process](R/multivariate_process/README.md)
+Multivariate extension using derivative information:
+- Uses original process, first derivative, and second derivative
+- Combines information across variables with weighted depth
+- **Best for**: Shape outliers and partially contaminated observations
+
+> ⚠️ **Note**: May mask magnitude outliers. Use when you expect shape but not magnitude outliers.
+
+### 3. [DirOut Methods](R/dirout/README.md)
+Directional outlyingness-based detection:
+- Two-component outlyingness (average and variance)
+- Captures both magnitude and shape outliers
+- **Best for**: Comprehensive outlier detection when both types are possible
+
+### 4. [Sliding Window](R/sliding_window/README.md)
+Local outlier detection using sliding windows:
+- Window-based functional depth and boxplot detection
+- Aggregates outlier flags across multiple windows
+- **Best for**: Non-stationary data and local pattern detection
+
+## Quick Start
+
+### Installation
+
+```r
+# Required packages
+library(fda)
+library(roahd)
+library(fda.usc)
+library(mrfDepth)
+library(fdaoutlier)  # For DirOut methods
+```
+
+### Basic Example
+
+```r
+# Source required files
+source("R/utils.R")
+source("R/depths.R")
+
+# Prepare your functional data
+data_matrix <- matrix(rnorm(100*50), nrow = 100, ncol = 50)
+fdataobj <- fdata(data_matrix)
+
+# Method 1: Original proposal (MBBo)
+source("R/original_proposal/bootstrap-procedures.R")
+source("R/original_proposal/outlier-detection-procedures.R")
+
+result <- outlier_bootstrap(
+    fdataobj = fdataobj,
+    boot = MBBo,
+    dfunc = MBD
+)
+
+print(result$outliers)
+```
+
+## Documentation
+
+Each method has detailed documentation with:
+- Complete function signatures and parameter descriptions
+- Working code examples
+- Parameter tuning guidelines
+- Troubleshooting tips
+
+See the README files in each directory:
+- [`R/original_proposal/README.md`](R/original_proposal/README.md)
+- [`R/multivariate_process/README.md`](R/multivariate_process/README.md)
+- [`R/dirout/README.md`](R/dirout/README.md)
+- [`R/sliding_window/README.md`](R/sliding_window/README.md)
+
+## Choosing a Method
+
+| Method | Best For | Strengths |
+|--------|----------|-----------|
+| **Original Proposal** | General use, magnitude outliers | Robust, well-tested, multiple bootstrap options |
+| **Multivariate Process** | Shape outliers, partial contamination | Excellent for shape detection, uses derivative info |
+| **DirOut** | Comprehensive detection | Two-component outlyingness, captures both types |
+| **Sliding Window** | Non-stationary data, local patterns | Local context, no bootstrap required |
+
+## Repository Structure
+
+```
+R/
+├── original_proposal/     # Original bootstrap methods
+├── multivariate_process/  # Multivariate extension with derivatives
+├── dirout/                # Directional outlyingness methods
+├── sliding_window/        # Sliding window approach
+├── real_data/            # Real data examples
+├── depths.R              # Depth function implementations
+├── utils.R               # Utility functions
+└── simulated-models.R    # Simulation models for testing
+```
+
+## References
+
+Raña, P., Aneiros, G. and Vilar, J. (2015) Detection of outliers in functional time series. Environmetrics, 26, 178–191.
+
+## License
+
+[Add your license information here]
