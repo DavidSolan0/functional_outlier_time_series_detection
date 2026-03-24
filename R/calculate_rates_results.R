@@ -48,16 +48,16 @@ run_simulation <- function(
       )
 
       vector <- c(
-        rates$false_positive_rate,
         rates$true_positive_rate,
         rates$sd_true_positive_rate,
+        rates$false_positive_rate,
         rates$true_positive_rate_zero_clean
       )
 
       vector_names <- c(
-        "false_positive_rate",
         "true_positive_rate",
         "sd_true_positive_rate",
+        "false_positive_rate",
         "true_positive_rate_zero_clean"
       )
 
@@ -129,16 +129,16 @@ run_simulation_multivariate <- function(
       )
 
       vector <- c(
-        rates$false_positive_rate,
         rates$true_positive_rate,
         rates$sd_true_positive_rate,
+        rates$false_positive_rate,
         rates$true_positive_rate_zero_clean
       )
 
       vector_names <- c(
-        "false_positive_rate",
         "true_positive_rate",
         "sd_true_positive_rate",
+        "false_positive_rate",
         "true_positive_rate_zero_clean"
       )
 
@@ -209,16 +209,16 @@ run_simulation_dirout <- function(
     # sd: Standard deviation of true positive rate
     # pdc: Clean detection rate
     vector <- c(
-      rates$false_positive_rate,
       rates$true_positive_rate,
       rates$sd_true_positive_rate,
+      rates$false_positive_rate,
       rates$true_positive_rate_zero_clean
     )
     names(vector) <- paste0(
       c(
-        "false_positive_rate",
         "true_positive_rate",
         "sd_true_positive_rate",
+        "false_positive_rate",
         "true_positive_rate_zero_clean"
       ),
       "-",
@@ -292,16 +292,16 @@ run_simulation_sliding_window <- function(
     # sd: Standard deviation of true positive rate
     # pdc: Clean detection rate
     vector <- c(
-      rates$false_positive_rate,
       rates$true_positive_rate,
       rates$sd_true_positive_rate,
+      rates$false_positive_rate,
       rates$true_positive_rate_zero_clean
     )
     names(vector) <- paste0(
       c(
-        "false_positive_rate",
         "true_positive_rate",
         "sd_true_positive_rate",
+        "false_positive_rate",
         "true_positive_rate_zero_clean"
       ),
       "-",
