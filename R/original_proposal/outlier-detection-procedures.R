@@ -96,11 +96,13 @@ outlier_bootstrap <- function(
     ii <- ii + 1
   }
 
+  depths <- dfunc(curvasgood[["data"]])
+
   # Return the outliers, the depths of the outliers,
   # the indices of the iterations, the cutoff, and the depths
   return(list(
     outliers = outliers, dep.out = dep.out, iteration = ite,
-    quantile = cutoff
+    quantile = cutoff, depths = depths
   ))
 }
 
