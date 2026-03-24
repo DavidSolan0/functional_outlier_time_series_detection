@@ -22,7 +22,11 @@ source("R/utils.R")
 temp_data <- read.csv("data/temperature2.csv", sep = ";", dec = ".")
 
 # Extract date and time components
-temp_data$datetime <- as.POSIXct(temp_data$Fecha, format = "%d/%m/%y %H:%M")
+temp_data$datetime <- as.POSIXct(
+    temp_data$Fecha,
+    format = "%d/%m/%y %H:%M",
+    tz = "Europe/Madrid"
+)
 temp_data$date <- as.Date(temp_data$datetime)
 temp_data$minute <- format(temp_data$datetime, "%H:%M")
 
@@ -161,6 +165,7 @@ lines(temp_fdata[mfdata_outliers$outliers, ],
 
 
 #* Outlier detection using dirout univatiare version
+# set.seed(010496)
 outlier_dirout_results <- outlier_dirout(
     temp_fdata,
     dfunc = "random_projections",
@@ -235,8 +240,7 @@ median_curve <- fdata(
 sort(sliding_window_outliers$outliers)
 length(sliding_window_outliers$outliers) / nrow(temp_fdata)
 
-
-#* Graphical outlier detectionsummary
+#* Graphical outlier detection summary
 
 # Unique outliers detected by the proposal
 proposal_detected_outliers <- unique(
@@ -315,6 +319,95 @@ legend("topleft",
     cex = 1,
     bty = "n" # No legend box
 )
+
+#* Outlier days temperature statistics
+multi_fbox_outliers <- row.names(temp_fdata[["data"]])[mfdata_outliers$outliers]
+# all_outliers <- unique(
+#     c(
+#         outlier_dirout_results$outliers,
+#         sliding_window_outliers$outliers,
+#         original_ouliers,
+#         multi_fbox_outliers
+#     )
+# ) %>% sort()
+
+all_outliers <- c(
+    "2011-11-02", "2011-11-12", "2011-11-13", "2011-11-14", "2011-11-17",
+    "2011-12-02", "2011-12-03", "2011-12-11", "2011-12-13", "2012-01-04",
+    "2012-01-14", "2012-01-15", "2012-01-26", "2012-02-04", "2012-02-23",
+    "2012-02-24", "2012-02-27"
+)
+
+# Get the temp data for outlier days
+outlier_temp_data <- temp_fdata[all_outliers, ]$data
+outlier_days <- row.names(outlier_temp_data)
+
+# Compute summaries for each day
+temp_stats <- apply(outlier_temp_data, 1, function(x) {
+    mean_val <- mean(x, na.rm = TRUE)
+    sd_val <- sd(x, na.rm = TRUE)
+    median_val <- median(x, na.rm = TRUE)
+    q1 <- quantile(x, 0.25, na.rm = TRUE, names = FALSE)
+    q3 <- quantile(x, 0.75, na.rm = TRUE, names = FALSE)
+    data.frame(
+        Mean_SD = sprintf("%.2f (%.2f)", mean_val, sd_val),
+        Median_IQR = sprintf("%.2f (%.2f - %.2f)", median_val, q1, q3),
+        row.names = NULL,
+        stringsAsFactors = FALSE
+    )
+})
+
+# Combine stats and set row names to outlier days
+temp_stats_df <- do.call(rbind, temp_stats)
+row.names(temp_stats_df) <- outlier_days
+
+# Print the summary table
+temp_stats_df
+
+# Compute the mean temperature for each day
+row_means <- rowMeans(temp_fdata$data)
+
+# Compute the percentile rank for each day's mean temperature
+row_percentiles <- sapply(row_means, function(x) ecdf(row_means)(x) * 100)
+
+# Name the vector with corresponding dates (if rownames exist)
+names(row_percentiles) <- row.names(temp_fdata$data)
+
+row_percentiles[all_outliers]
+
+# ---- NEW: Calculate monthly average and stats table ----
+
+# Extract the month info from row names (assuming "YYYY-MM-DD" format)
+row_mean_names <- names(row_means)
+months <- substr(row_mean_names, 6, 7)
+month_labels <- c("11" = "November", "12" = "December", "01" = "January", "02" = "February")
+month_names <- month_labels[months]
+
+# Compute the mean daily temperature for each month
+month_avg <- tapply(row_means, month_names, mean, na.rm = TRUE)
+
+# Split per-day means per month for stats
+split_means <- split(row_means, factor(month_names, levels = unique(month_names)))
+
+# Build table with monthly daily average stats: mean (sd), median (q1-q3)
+month_stats <- lapply(split_means, function(x) {
+  mean_val <- mean(x, na.rm = TRUE)
+  sd_val <- sd(x, na.rm = TRUE)
+  median_val <- median(x, na.rm = TRUE)
+  q1 <- quantile(x, 0.25, na.rm = TRUE, names = FALSE)
+  q3 <- quantile(x, 0.75, na.rm = TRUE, names = FALSE)
+  data.frame(
+    Mean_SD = sprintf("%.2f (%.2f)", mean_val, sd_val),
+    Median_IQR = sprintf("%.2f (%.2f - %.2f)", median_val, q1, q3),
+    row.names = NULL,
+    stringsAsFactors = FALSE
+  )
+})
+
+month_stats_df <- do.call(rbind, month_stats)
+row.names(month_stats_df) <- names(month_stats)
+
+month_stats_df
 
 #* Outlier detection using sliding window multivariate version
 # sliding_window_outliers_multivariate <- multivariate_sliding_window_outlier(
