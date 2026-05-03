@@ -4,12 +4,9 @@ A comprehensive R implementation for detecting outliers in functional time serie
 
 ## Overview
 
-This repository provides multiple approaches for outlier detection in functional time series, extending the original proposal by Raña et al. (2015) with several enhancements:
+This repository provides multiple approaches for outlier detection in functional time series, based on and extending methods from the literature, and is the official research code repository for:
 
-- **Bootstrap-based methods** for robust cutoff estimation
-- **Multivariate extensions** using derivative information for shape outlier detection
-- **Directional outlyingness (DirOut)** methods for comprehensive outlier characterization
-- **Sliding window approaches** for local outlier detection
+**A Hybrid Nonparametric Framework for Outlier Detection in Functional Time Series**
 
 ## Available Methods
 
@@ -19,13 +16,10 @@ Bootstrap-based outlier detection methods following Raña et al. (2015):
 - **MBBo**: Moving block bootstrap (for temporal dependence)
 - **StBo**: Stationary bootstrap
 
-**Best for**: General-purpose outlier detection, especially magnitude outliers.
-
 ### 2. [Multivariate Process](R/multivariate_process/README.md)
 Multivariate extension using derivative information:
 - Uses original process, first derivative, and second derivative
 - Combines information across variables with weighted depth
-- **Best for**: Shape outliers and partially contaminated observations
 
 > ⚠️ **Note**: May mask magnitude outliers. Use when you expect shape but not magnitude outliers.
 
@@ -33,13 +27,11 @@ Multivariate extension using derivative information:
 Directional outlyingness-based detection:
 - Two-component outlyingness (average and variance)
 - Captures both magnitude and shape outliers
-- **Best for**: Comprehensive outlier detection when both types are possible
 
 ### 4. [Sliding Window](R/sliding_window/README.md)
 Local outlier detection using sliding windows:
 - Window-based functional depth and boxplot detection
 - Aggregates outlier flags across multiple windows
-- **Best for**: Non-stationary data and local pattern detection
 
 ## Quick Start
 
@@ -115,10 +107,11 @@ R/
 └── simulated-models.R    # Simulation models for testing
 ```
 
-## References
+## Reference
 
-Raña, P., Aneiros, G. and Vilar, J. (2015) Detection of outliers in functional time series. Environmetrics, 26, 178–191.
+If you use this code, please cite:
 
-## License
+**A Hybrid Nonparametric Framework for Outlier Detection in Functional Time Series**  
+CC BY-NC-ND 4.0
 
-[Add your license information here]
+[https://onlinelibrary.wiley.com/doi/10.1002/env.70099](https://onlinelibrary.wiley.com/doi/10.1002/env.70099)
