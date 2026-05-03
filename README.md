@@ -84,14 +84,6 @@ See the README files in each directory:
 - [`R/dirout/README.md`](R/dirout/README.md)
 - [`R/sliding_window/README.md`](R/sliding_window/README.md)
 
-## Choosing a Method
-
-| Method | Best For | Strengths |
-|--------|----------|-----------|
-| **Original Proposal** | General use, magnitude outliers | Robust, well-tested, multiple bootstrap options |
-| **Multivariate Process** | Shape outliers, partial contamination | Excellent for shape detection, uses derivative info |
-| **DirOut** | Comprehensive detection | Two-component outlyingness, captures both types |
-| **Sliding Window** | Non-stationary data, local patterns | Local context, no bootstrap required |
 
 ## Repository Structure
 
